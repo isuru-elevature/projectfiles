@@ -1,78 +1,79 @@
 @extends('layouts.userApp')
 @section('content')
-    <style>
-        .text-xl {
-            font-size:1.5rem;
-                'success' => true,
-            color:#234765;
-        }
+<style>
+    .text-xl {
+        font-size: 1.5rem;
+        'success'=>true,
+        color: #234765;
+    }
 
-        hr {
-            height:3px !important; 
-            color:#234765;
-        }
+    hr {
+        height: 3px !important;
+        color: #234765;
+    }
 
-        .main-container {
-            color:#234765;
-        }
+    .main-container {
+        color: #234765;
+    }
 
-        .min-h-screen {
-            background-color:#F5F5F5 !important;
-        }
+    .min-h-screen {
+        background-color: #F5F5F5 !important;
+    }
 
-        .card {
-            min-height:322px;
-            max-height:322px;
-            overflow-x: hidden;
-        }
+    .card {
+        min-height: 322px;
+        max-height: 322px;
+        overflow-x: hidden;
+    }
 
-        .field_option_icon {
-            width: 1.8rem;
-            height: 1.5rem;
-            cursor: pointer;
-        }
-        
-        .editIcon {
-            height: 1.1rem;
-            cursor: pointer;
-        }
+    .field_option_icon {
+        width: 1.8rem;
+        height: 1.5rem;
+        cursor: pointer;
+    }
 
-        .data_source_field {
-            padding: 3px 0px;
-        }
+    .editIcon {
+        height: 1.1rem;
+        cursor: pointer;
+    }
 
-        .data_sources {
-            padding: 3px 0px;
-        }
+    .data_source_field {
+        padding: 3px 0px;
+    }
 
-        .data_source_option {
-            padding: 3px 0px;
-        }
+    .data_sources {
+        padding: 3px 0px;
+    }
 
-        #result {
-            border-color:#dededf !important;
-        }
+    .data_source_option {
+        padding: 3px 0px;
+    }
 
-        .size {
-            font-size: 14px !important;
-        }
-        footer{
-            background-color:#113C54;
-        }
-    </style>
-    <!-- <x-slot name="header">
+    #result {
+        border-color: #dededf !important;
+    }
+
+    .size {
+        font-size: 14px !important;
+    }
+
+    footer {
+        background-color: #113C54;
+    }
+</style>
+<!-- <x-slot name="header">
         <h1 class="font-semibold fw-bolder text-xl text-gray-800 leading-tight" >
             {{ __('Merge Field Coding Tool') }}
         </h1>
         <hr class="mt-3">
         
     </x-slot> -->
-   
-    <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 main-container">
-        <div class="row">
-       
-        
-            <!-- <div class="col-lg-4 col-md-6 col-sm-12">
+
+<div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 main-container">
+    <div class="row">
+
+
+        <!-- <div class="col-lg-4 col-md-6 col-sm-12">
                 <label for="">Select Data Source</label>
                 <div class="card ">
                     <div class="card-body p-0 px-2">
@@ -108,176 +109,205 @@
               
             </div> -->
 
-            <div class="col-lg-4 col-md-6 col-sm-12">
-    <label for="">Select Data Source</label>
-    <div class="card ">
-        <div class="card-body p-0 px-2">
-            <div class="data-source">
-                <!-- Loop through Actionstep data instead of $dataSources -->
-                @if(isset($actionstepData['actiontypes']) && is_array($actionstepData['actiontypes']))
-                    @foreach($actionstepData['actiontypes'] as $actionType)
-                        <div class="row data_sources">
-                            <div class="col-10" style="cursor:pointer;">
-                                <p class="data_sources_name size">{{ $actionType['name'] }}</p>
-                            </div>
-                            <div class="col-2">
-                                <!-- You can add buttons or links here as needed -->
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <label for="">Select Data Source</label>
+            <div class="card ">
+                <div class="card-body p-0 px-2">
+                    <div class="data-source">
+
+                        @if(isset($actionstepData['actiontypes']) && is_array($actionstepData['actiontypes']))
+                        @foreach($actionstepData['actiontypes'] as $actionType)
+                        <!-- Check if there are data collections for this action type -->
+                        @if(isset($actionTypesWithDataCollections[$actionType['id']]) && count($actionTypesWithDataCollections[$actionType['id']]) > 0)
+                        <!-- Loop through each data collection label -->
+                        @foreach($actionTypesWithDataCollections[$actionType['id']] as $dataCollectionLabel => $dataCollectionId)
+                        <div class="row data_sources" data-collection-id="{{ $dataCollectionId }}">
+                            <div class="col-12">
+                                <p class="data_sources_name size" onclick="showFieldsForCollection('{{ $dataCollectionId }}')">{{ $actionType['name'] }} - {{ $dataCollectionLabel }}</p>
                             </div>
                         </div>
-                    @endforeach
-                @else
-                    <p>No Action Types available.</p>
-                @endif
+                        @endforeach
+                        @else
+                        <!-- Display the action type name even if there are no data collections -->
+                        <div class="row data_sources">
+                            <div class="col-12">
+                                <p class="data_sources_name size">{{ $actionType['name'] }}</p>
+                            </div>
+                        </div>
+                        @endif
+                        @endforeach
+                        @else
+                        <p>No Action Types available.</p>
+                        @endif
+
+                    </div>
+                </div>
+            </div>
+            <!-- Other content -->
+        </div>
+
+
+
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <label for="">Select A Field</label>
+            <div class="card ">
+                <div class="card-body p-0 px-2 data_field">
+
+                </div>
+            </div>
+
+            <a href="#" class="btn btn-sm float-start my-3 create_btn" data-bs-toggle="modal" data-bs-target="#createDataSourceTypeModal"><i class="fa fa fa-plus"></i> CREATE DATA SOURCE FIELD</a>
+
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <div class="">
+                <img src="{{asset('public/images/Icons/noun-flip.svg')}}" class="field_option_icon d-inline float-end border ms-1" alt="Flip" title="Flip" data-id="Flip">
+
+                <img src="{{asset('public/images/Icons/other.svg')}}" class="field_option_icon d-inline float-end border ms-1" alt="Other" data-id="Other" title="Other">
+
+
+                <img src="{{asset('public/images/Icons/sort.svg')}}" class="field_option_icon d-inline float-end border ms-1" alt="Sort" title="Sort" data-id="Sort">
+
+
+                <img src="{{asset('public/images/Icons/money.svg')}}" class="field_option_icon d-inline float-end border ms-1" alt="Sale & Purchase" title="Sale & Purchase" data-id="Sale & Purchase">
+
+
+                <img src="{{asset('public/images/Icons/image.svg')}}" class="field_option_icon d-inline float-end border ms-1" alt="Images" title="Images" data-id="Images">
+
+
+                <img src="{{asset('public/images/Icons/person.svg')}}" class="field_option_icon d-inline float-end border ms-1" alt="Grammar" title="Grammar" data-id="Grammar">
+
+
+                <img src="{{asset('public/images/Icons/logic.svg')}}" class="field_option_icon d-inline float-end border ms-1" alt="Logic" title="Logic" data-id="Logic">
+
+
+                <img src="{{asset('public/images/Icons/repeat.svg')}}" class="field_option_icon d-inline float-end border ms-1" alt="Repeat" title="Repeat" data-id="Repeat">
+
+
+                <img src="{{asset('public/images/Icons/edit.svg')}}" class="field_option_icon d-inline float-end border ms-1" alt="Calendar" title="Calendar" data-id="Calendar">
+
+
+                <img src="{{asset('public/images/Icons/phones.svg')}}" class="field_option_icon d-inline float-end border ms-1" alt="Phones" title="Phones" data-id="Phones">
+
+
+                <img src="{{asset('public/images/Icons/numbers.svg')}}" class="field_option_icon d-inline float-end border ms-1" alt="Numbers" title="Numbers" data-id="Numbers">
+
+
+                <img src="{{asset('public/images/Icons/text.svg')}}" class="field_option_icon d-inline float-end border ms-1" alt="Text" title="Text" data-id="Text">
+
+            </div>
+
+            <div class="card">
+                <div class="card-body p-0 px-2 data_options">
+
+                </div>
+            </div>
+            @if(Auth::user()->role=='Admin')
+            <a href="#" class="btn btn-sm float-start my-3 create_btn" data-bs-toggle="modal" data-bs-target="#createDataSourceOptionModal"><i class="fa fa fa-plus"></i> CREATE DATA SOURCE OPTION</a>
+            @endif
+        </div>
+    </div>
+
+    {!! Form::open(['id'=>'saveResult','url' => 'createResult']) !!}
+    <div class="row mt-4">
+        <label for="result" class=" fw-bolder"> <b>Result</b></label>
+        <div class="col-10" style="position:relative;">
+            <input type="text" name="result" id="result" class="form-control data">
+            <button id="trash" type="button" onclick="clearText()" style="position: absolute; right: 25px;top: 10px; background: none;"><i class="fa fa-trash" aria-hidden="true"></i></button>
+        </div>
+        <div class="col-2">
+
+            <button type="submit" class="btn btn-secondary add_history">Add to List</button>
+        </div>
+    </div>
+    {!! Form::close() !!}
+    <div class="mt-5">
+        <p>History List</p>
+        <div class="card ">
+
+            <div class="card-body p-0 px-2 result_history">
+
             </div>
         </div>
     </div>
-    <!-- Other content -->
 </div>
+@include('DataSource.createModal')
 
-            <div class="col-lg-4 col-md-6 col-sm-12">
-                <label for="">Select A Field</label>
-                <div class="card ">
-                    <div class="card-body p-0 px-2 data_field">
-
-                    </div>
-                </div>
-                
-                    <a href="#" class="btn btn-sm float-start my-3 create_btn" data-bs-toggle="modal" data-bs-target="#createDataSourceTypeModal"><i class="fa fa fa-plus"></i> CREATE DATA SOURCE FIELD</a>
-              
-            </div>
-            <div class="col-lg-4 col-md-6 col-sm-12">
-                <div class="">
-                <img src="{{asset('public/images/Icons/noun-flip.svg')}}" class="field_option_icon d-inline float-end border ms-1"  alt="Flip" title="Flip" data-id="Flip">
-                        
-                    <img src="{{asset('public/images/Icons/other.svg')}}" class="field_option_icon d-inline float-end border ms-1"  alt="Other" data-id="Other" title="Other">
-                            
-                            
-                    <img src="{{asset('public/images/Icons/sort.svg')}}" class="field_option_icon d-inline float-end border ms-1"  alt="Sort" title="Sort" data-id="Sort">
-                            
-                            
-                    <img src="{{asset('public/images/Icons/money.svg')}}" class="field_option_icon d-inline float-end border ms-1"  alt="Sale & Purchase" title="Sale & Purchase" data-id="Sale & Purchase">
-                            
-                            
-                    <img src="{{asset('public/images/Icons/image.svg')}}" class="field_option_icon d-inline float-end border ms-1"  alt="Images" title="Images" data-id="Images">
-                            
-                            
-                    <img src="{{asset('public/images/Icons/person.svg')}}" class="field_option_icon d-inline float-end border ms-1"  alt="Grammar" title="Grammar" data-id="Grammar">
-                            
-                            
-                        <img src="{{asset('public/images/Icons/logic.svg')}}" class="field_option_icon d-inline float-end border ms-1"  alt="Logic" title="Logic" data-id="Logic">
-                            
-                            
-                        <img src="{{asset('public/images/Icons/repeat.svg')}}" class="field_option_icon d-inline float-end border ms-1"  alt="Repeat" title="Repeat" data-id="Repeat">
-                            
-                            
-                        <img src="{{asset('public/images/Icons/edit.svg')}}" class="field_option_icon d-inline float-end border ms-1"  alt="Calendar" title="Calendar" data-id="Calendar">
-                            
-                            
-                        <img src="{{asset('public/images/Icons/phones.svg')}}" class="field_option_icon d-inline float-end border ms-1"  alt="Phones" title="Phones" data-id="Phones">
-                            
-                            
-                        <img src="{{asset('public/images/Icons/numbers.svg')}}" class="field_option_icon d-inline float-end border ms-1"  alt="Numbers" title="Numbers" data-id="Numbers">
-                            
-                            
-                        <img src="{{asset('public/images/Icons/text.svg')}}" class="field_option_icon d-inline float-end border ms-1"  alt="Text" title="Text" data-id="Text">
-        
-                </div>
-                
-                        <div class="card">
-                    <div class="card-body p-0 px-2 data_options">
-
-                    </div>
-                </div>
-                @if(Auth::user()->role=='Admin')
-                    <a href="#" class="btn btn-sm float-start my-3 create_btn" data-bs-toggle="modal" data-bs-target="#createDataSourceOptionModal"><i class="fa fa fa-plus"></i> CREATE DATA SOURCE OPTION</a>
-                @endif    
-            </div>
-        </div>
-
-        {!! Form::open(['id'=>'saveResult','url' => 'createResult']) !!}
-            <div class="row mt-4">
-                <label for="result" class=" fw-bolder"> <b>Result</b></label>
-                <div class="col-10" style="position:relative;">
-                    <input type="text" name="result" id="result" class="form-control data" >
-                    <button id="trash" type="button" onclick = "clearText()" style="position: absolute; right: 25px;top: 10px; background: none;" ><i class="fa fa-trash"  aria-hidden="true"></i></button>
-                </div>
-                <div class="col-2" >
-               
-                    <button type="submit" class="btn btn-secondary add_history">Add to List</button>
-                </div>
-            </div>
-        {!! Form::close() !!}
-       <div class="mt-5">
-          <p>History List</p>
-           <div class="card ">
-           
-                <div class="card-body p-0 px-2 result_history">
-                    
-                </div>
-            </div>
-        </div>
-    </div>
-    @include('DataSource.createModal')
-
-    <!-- <footer class="text-center max-w-7xl text-white mx-auto py-2">
+<!-- <footer class="text-center max-w-7xl text-white mx-auto py-2">
         <p>Brought to you by</p>
         <div class="">
         <img src="{{url('public/images/Logo.svg')}}" height="160px" width="160px">
         </div>
     </footer> -->
+
 <script>
-    
-    
-// console.log(data);
-$(document).on('click', '.create_btn', function () {
-    document.getElementById("delete_id").value = ""; 
-    document.getElementById("delete_field_id").value = ""; 
-    fetch_Dropdown();
-    // var id=$('#type_of_datasource_id').val();
-    // $('.dataSourceType option[value="'+id+'"]').attr('selected','selected');
-});
+    function showFieldsForCollection(collectionId) {
+        var fields = @json($dataCollectionFieldsByCollection);
+        var fieldContainer = document.querySelector('.data_field');
+        fieldContainer.innerHTML = ''; // Clear existing fields
 
-$(document).on('click', '.edit_data_source_type_btn', function () {
- 
-    fetch_Dropdown();
-    // var id=$('#type_of_datasource_id').val();
-    // $('.dataSourceType option[value="'+id+'"]').attr('selected','selected');
-});
+        // Check if fields for the collection exist and have elements
+        if (fields[collectionId] && fields[collectionId].length > 0) {
+            fields[collectionId].forEach(function(label) {
+                var p = document.createElement('p');
+                p.textContent = label;
+                fieldContainer.appendChild(p);
+            });
+        } else {
+            fieldContainer.innerHTML = '<p>No fields available for this selection.</p>';
+        }
+    }
 
-function fetch_Dropdown(){
-    var id=$('#type_of_datasource_id').val();
-    var sid =id; 
-	$.ajax({
-		method: 'POST',
-		url: 'fetch_dataSource',
-		dataType: 'json',
-		success:function success(result) {
+    // console.log(data);
+    $(document).on('click', '.create_btn', function() {
+        document.getElementById("delete_id").value = "";
+        document.getElementById("delete_field_id").value = "";
+        fetch_Dropdown();
+        // var id=$('#type_of_datasource_id').val();
+        // $('.dataSourceType option[value="'+id+'"]').attr('selected','selected');
+    });
+
+    $(document).on('click', '.edit_data_source_type_btn', function() {
+
+        fetch_Dropdown();
+        // var id=$('#type_of_datasource_id').val();
+        // $('.dataSourceType option[value="'+id+'"]').attr('selected','selected');
+    });
+
+    function fetch_Dropdown() {
+        var id = $('#type_of_datasource_id').val();
+        var sid = id;
+        $.ajax({
+            method: 'POST',
+            url: 'fetch_dataSource',
+            dataType: 'json',
+            success: function success(result) {
                 if (result.success) {
                     var data = result.data;
-   
-                    var resp_data ="";
-                    
-                    resp_data+= ` 
+
+                    var resp_data = "";
+
+                    resp_data += ` 
                         <option value="" selected=
                         "selected" disabled="disabled"">please select datasource </option>`;
                     $.each(data, function(key, val) {
-                       
 
-                      var status=val.status;
-                      if(status==1){
-                        if(val.id == sid ){
-                            
-                       resp_data+= ` 
+
+                        var status = val.status;
+                        if (status == 1) {
+                            if (val.id == sid) {
+
+                                resp_data += ` 
                             <option value="${val.id}" data-sourcetype="${val.data_source_type}" selected=
                             "selected"">${val.name}</option>`;
-                        }else{
-                            resp_data+= ` 
+                            } else {
+                                resp_data += ` 
                             <option value="${val.id}" data-sourcetype="${val.data_source_type}"">${val.name}</option>`;
+                            }
                         }
-                      }
-                      
-                    $('.dataSourceType').html(resp_data);
-                   
+
+                        $('.dataSourceType').html(resp_data);
+
                     })
                 }
             },
@@ -286,90 +316,90 @@ function fetch_Dropdown(){
             },
         });
 
-}
-$('select#data_source_type').change(function(){
-    // document.getElementById("type_of_datasource").value = value;
-    var aa=$(this).find(':selected').data('sourcetype');
-    $("#type_of_datasource").val(aa);
-    
-    // alert(aa);
-})
+    }
+    $('select#data_source_type').change(function() {
+        // document.getElementById("type_of_datasource").value = value;
+        var aa = $(this).find(':selected').data('sourcetype');
+        $("#type_of_datasource").val(aa);
+
+        // alert(aa);
+    })
 
 
-   function clearText() {
-		swal.fire({
-		  	title: 'Are you sure?',
-		  	text: "You won't be able to revert this!",
-		  	icon: 'warning',
-		  	showCancelButton: true,
-		  	confirmButtonColor: '#3085d6',
-		  	cancelButtonColor: '#d33',
-		  	confirmButtonText: 'Yes, delete it!',
-		}).then((result) => {
-		  	if (result.value){
-                document.getElementById("result").value = ""; 
-		  	}
- 
-		})
- 
-	}
+    function clearText() {
+        swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+        }).then((result) => {
+            if (result.value) {
+                document.getElementById("result").value = "";
+            }
 
- 
+        })
 
-	$(document).on('click', '.delete_dataSource', function(){
-		var id = $(this).data('id');
- 
-		swal.fire({
-		  	title: 'Are you sure?',
-		  	text: "You won't be able to revert this!",
-		  	icon: 'warning',
-		  	showCancelButton: true,
-		  	confirmButtonColor: '#3085d6',
-		  	cancelButtonColor: '#d33',
-		  	confirmButtonText: 'Yes, delete it!',
-		}).then((result) => {
-		  	if (result.value){
-		  		$.ajax({
-                    url: 'usersdelete_dataSource/'+id,
-                    type: 'POST',
-                    data: {
-                        "id": id   
-                    }
-			    })
-			    .done(function(response){
-			     	swal.fire('Deleted!', response.message, response.status);
-					fetch_DataSource();
-                    $(".data_field").html(" ");
-                    $(".data_options").html(" ");
-                    document.getElementById("result").value = "";
-                    // $("#result").html(" ");
-                    
-			    })
-			    .fail(function(){
-			     	swal.fire('Oops...', 'Something went wrong with ajax !', 'error');
-			    });
-		  	}
- 
-		})
-        
+    }
 
-	});
 
-    function fetch_DataSource(){
-	$.ajax({
-		method: 'POST',
-		url: 'fetch_dataSource',
-		dataType: 'json',
-		success:function success(result) {
+
+    $(document).on('click', '.delete_dataSource', function() {
+        var id = $(this).data('id');
+
+        swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+        }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                        url: 'usersdelete_dataSource/' + id,
+                        type: 'POST',
+                        data: {
+                            "id": id
+                        }
+                    })
+                    .done(function(response) {
+                        swal.fire('Deleted!', response.message, response.status);
+                        fetch_DataSource();
+                        $(".data_field").html(" ");
+                        $(".data_options").html(" ");
+                        document.getElementById("result").value = "";
+                        // $("#result").html(" ");
+
+                    })
+                    .fail(function() {
+                        swal.fire('Oops...', 'Something went wrong with ajax !', 'error');
+                    });
+            }
+
+        })
+
+
+    });
+
+    function fetch_DataSource() {
+        $.ajax({
+            method: 'POST',
+            url: 'fetch_dataSource',
+            dataType: 'json',
+            success: function success(result) {
                 if (result.success) {
                     var data = result.data;
-                   
-                    var resp_data ="";
-                    
+
+                    var resp_data = "";
+
                     $.each(data, function(key, val) {
-                      var status=val.status;
-                      if(status==1){
-                       resp_data+= ` 
+                        var status = val.status;
+                        if (status == 1) {
+                            resp_data += ` 
                        <div class="row data_sources" id="data_sources${val.id}">
                            <div class="col-10" style="cursor:pointer;">
                                <p class="data_sources_name size" type="${val.data_source_type}" id="${val.id}">${val.name}</p>
@@ -381,7 +411,7 @@ $('select#data_source_type').change(function(){
                                 </a>
                             </div>
                         </div>`;
-                      }
+                        }
                     })
                     $('.data-source').html(resp_data);
                 }
@@ -391,12 +421,12 @@ $('select#data_source_type').change(function(){
             },
         });
 
-}
+    }
 
 
- 
-    $('#createDataSource').submit(function (event) {
-     
+
+    $('#createDataSource').submit(function(event) {
+
         event.preventDefault();
         $.ajaxSetup({
             headers: {
@@ -420,35 +450,28 @@ $('select#data_source_type').change(function(){
             },
         });
 
-    }); 
- 
-
-
-
-
-    
+    });
 </script>
-    <script>
-      
-      $(document).ready(function() {
-       
-        function getHistory(){
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-        $.ajax({
-            url: 'getResult',
-            type: 'GET',
-            success: function success(result) {
-                if (result.success) {
-                    var data = result.data;
-                    // console.log(data);
-                    var resp_data ="";
-                    $.each(data, function(key, val) {
-                        // console.log(val.id);
-                        resp_data+= `<div class="row data_source_option" id="data_source_option${val.id}">
+<script>
+    $(document).ready(function() {
+
+        function getHistory() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            $.ajax({
+                url: 'getResult',
+                type: 'GET',
+                success: function success(result) {
+                    if (result.success) {
+                        var data = result.data;
+                        // console.log(data);
+                        var resp_data = "";
+                        $.each(data, function(key, val) {
+                            // console.log(val.id);
+                            resp_data += `<div class="row data_source_option" id="data_source_option${val.id}">
                             <div class="col-10" style="cursor:pointer;">
                                 <p class="data_source_options size" data-val="${val.result}" id="${val.id}">${val.result}</p>
                             </div>
@@ -458,179 +481,178 @@ $('select#data_source_type').change(function(){
                                 </button>
                             </div>
                         </div>`
-                    })
-                    $('.result_history').html(resp_data);
-                }
-            },
-            // error: function error(result) {
-            //     printErrorMessage('#validationErrorsBox', result);
-            // },
-        });
+                        })
+                        $('.result_history').html(resp_data);
+                    }
+                },
+                // error: function error(result) {
+                //     printErrorMessage('#validationErrorsBox', result);
+                // },
+            });
 
         }
         getHistory();
 
 
-        $(document).on('click','.deleteResult',function(){
-        var id = $(this).attr('id');
-        
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-        swal.fire({
-		  	title: 'Are you sure?',
-		  	text: "You won't be able to revert this!",
-		  	icon: 'warning',
-		  	showCancelButton: true,
-		  	confirmButtonColor: '#3085d6',
-		  	cancelButtonColor: '#d33',
-		  	confirmButtonText: 'Yes, delete it!',
-		}).then((result) => {
-		  	if (result.value){
-                $.ajax({
-            url: 'deleteResult/'+id,
-            type: 'GET',
-            success: function success(result) {
-                if (result.success) {
-                    displaySuccessMessage(result.message);
-                    getHistory();
-                  
+        $(document).on('click', '.deleteResult', function() {
+            var id = $(this).attr('id');
+
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
-            },
-            error: function error(result) {
-                printErrorMessage('#validationErrorsBox', result);
-            },
-        });
-		  	}
-              
- 
-		})
-      
-    });
-    //update data source 
-    $(document).on('click','.edit_data_source',function(){
-        var id = $(this).attr('id');
-      
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-        $.ajax({
-            url: 'Admin/editDataSource/'+id,
-            type: 'GET',
-            success: function success(result) {
-                if (result.success) {
-                   
-                    $('.data_source_name').val(result.data.name);
-                    $('.data_source_id').val(result.data.id);
-                    $('.data_source_type_field').val(result.data.data_source_type);
+            });
+            swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!',
+            }).then((result) => {
+                if (result.value) {
+                    $.ajax({
+                        url: 'deleteResult/' + id,
+                        type: 'GET',
+                        success: function success(result) {
+                            if (result.success) {
+                                displaySuccessMessage(result.message);
+                                getHistory();
 
-                    $('#createDataSourceModal').modal('toggle');
-                  
+                            }
+                        },
+                        error: function error(result) {
+                            printErrorMessage('#validationErrorsBox', result);
+                        },
+                    });
                 }
-            },
-            error: function error(result) {
-                printErrorMessage('#validationErrorsBox', result);
-            },
-        });
-    });
 
-     // update data source type 
-    $(document).on('click','.edit_data_source_type_btn',function(){
-        var id = $(this).attr('id');
-      
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-        $.ajax({
-            url: 'Admin/editDataSourceType/'+id,
-            type: 'GET',
-            success: function success(result) {
-                if (result.success) {
-                   
-                    $('.dataSourceName').val(result.data.dataSourceName);
-                    $('.data_source_type_id').val(result.data.id);
-                    $('.mergeFieldDescription').val(result.data.mergeFieldDescription);
-                    
-                    $('.dataSourceType option[value="'+result.data.dataSourceType+'"]').attr('selected','selected');
 
-                    $('#createDataSourceTypeModal').modal('toggle');
-                  
+            })
+
+        });
+        //update data source 
+        $(document).on('click', '.edit_data_source', function() {
+            var id = $(this).attr('id');
+
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
-            },
-            error: function error(result) {
-                printErrorMessage('#validationErrorsBox', result);
-            },
-        });
-    });
+            });
+            $.ajax({
+                url: 'Admin/editDataSource/' + id,
+                type: 'GET',
+                success: function success(result) {
+                    if (result.success) {
 
-      // update data source options 
-      $(document).on('click','.getDataSourceOptionBtn',function(){
-        var id = $(this).attr('id');
-      
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-        $.ajax({
-            url: 'Admin/editDataSourceOption/'+id,
-            type: 'GET',
-            success: function success(result) {
-               
-                if (result.success) {
-                   
-                    $('.option_name').val(result.data.option_name);
-                    $('.option_id').val(result.data.id);
-                    $('.option_value').val(result.data.option_value);
-                    
-                    $('.option_type_class option[value="'+result.data.option_type+'"]').attr('selected','selected');
+                        $('.data_source_name').val(result.data.name);
+                        $('.data_source_id').val(result.data.id);
+                        $('.data_source_type_field').val(result.data.data_source_type);
 
-                    $('#createDataSourceOptionModal').modal('toggle');
-                  
+                        $('#createDataSourceModal').modal('toggle');
+
+                    }
+                },
+                error: function error(result) {
+                    printErrorMessage('#validationErrorsBox', result);
+                },
+            });
+        });
+
+        // update data source type 
+        $(document).on('click', '.edit_data_source_type_btn', function() {
+            var id = $(this).attr('id');
+
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
-            },
-            error: function error(result) {
-                printErrorMessage('#validationErrorsBoxDSO',result.error);
+            });
+            $.ajax({
+                url: 'Admin/editDataSourceType/' + id,
+                type: 'GET',
+                success: function success(result) {
+                    if (result.success) {
 
-            },
+                        $('.dataSourceName').val(result.data.dataSourceName);
+                        $('.data_source_type_id').val(result.data.id);
+                        $('.mergeFieldDescription').val(result.data.mergeFieldDescription);
+
+                        $('.dataSourceType option[value="' + result.data.dataSourceType + '"]').attr('selected', 'selected');
+
+                        $('#createDataSourceTypeModal').modal('toggle');
+
+                    }
+                },
+                error: function error(result) {
+                    printErrorMessage('#validationErrorsBox', result);
+                },
+            });
+        });
+
+        // update data source options 
+        $(document).on('click', '.getDataSourceOptionBtn', function() {
+            var id = $(this).attr('id');
+
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            $.ajax({
+                url: 'Admin/editDataSourceOption/' + id,
+                type: 'GET',
+                success: function success(result) {
+
+                    if (result.success) {
+
+                        $('.option_name').val(result.data.option_name);
+                        $('.option_id').val(result.data.id);
+                        $('.option_value').val(result.data.option_value);
+
+                        $('.option_type_class option[value="' + result.data.option_type + '"]').attr('selected', 'selected');
+
+                        $('#createDataSourceOptionModal').modal('toggle');
+
+                    }
+                },
+                error: function error(result) {
+                    printErrorMessage('#validationErrorsBoxDSO', result.error);
+
+                },
+            });
         });
     });
-});
-
 </script>
 
 <script>
- //get field and show data source field
- function fetch_DataSourceField(id){
-                $.ajaxSetup({
+    //get field and show data source field
+    function fetch_DataSourceField(id) {
+        $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
         $.ajax({
-            url: 'getDataSourceType/'+id,
+            url: 'getDataSourceType/' + id,
             type: 'GET',
-           
+
             success: function success(result) {
                 if (result.success) {
                     let participant = result.data[0].data_source_type;
-                    let dataSourceName=result.data[0].name;
-                    let resp_data ="";
-                    let data =result.field;
+                    let dataSourceName = result.data[0].name;
+                    let resp_data = "";
+                    let data = result.field;
                     let data2 = result.data[0].get_data_source_type;
                     //    console.log(participant);
-                       if(participant=='Custom' || participant=='Default' ){ 
+                    if (participant == 'Custom' || participant == 'Default') {
                         $.each(data, function(key, val) {
-                        // console.log(val.dataSourceName);
-                      var status=val.status;
-                      if(status==1){
-                       resp_data+= ` 
+                            // console.log(val.dataSourceName);
+                            var status = val.status;
+                            if (status == 1) {
+                                resp_data += ` 
                        <div class="row data_source_field" id="data_source_field${val.id}">
                            <div class="col-10" style="cursor:pointer;">
                                <p class="data_source_type size" data-sourcetype="${participant}" data-sourceName="${dataSourceName}" data-type="${val.dataSourceType}" id="${val.id}">${val.dataSourceName}</p>
@@ -642,14 +664,14 @@ $('select#data_source_type').change(function(){
                                 </a>
                             </div>
                         </div>`;
-                      }
-                    })
-                }else{
-                    $.each(data2, function(key, val) {
-                        // console.log(val.dataSourceName);
-                      var status=val.status;
-                      if(status==1){
-                       resp_data+= ` 
+                            }
+                        })
+                    } else {
+                        $.each(data2, function(key, val) {
+                            // console.log(val.dataSourceName);
+                            var status = val.status;
+                            if (status == 1) {
+                                resp_data += ` 
                        <div class="row data_source_field" id="data_source_field${val.id}">
                            <div class="col-10" style="cursor:pointer;">
                                <p class="data_source_type size" data-sourcetype="Participant" data-sourceName="${dataSourceName}" data-type="${val.dataSourceType}" id="${val.id}">${val.dataSourceName}</p>
@@ -661,11 +683,11 @@ $('select#data_source_type').change(function(){
                                 </a>
                             </div>
                         </div>`;
-                      }
-                    })
-                }
-                      
-                    
+                            }
+                        })
+                    }
+
+
                     $('.data_field').html(resp_data);
                 }
             },
@@ -673,39 +695,39 @@ $('select#data_source_type').change(function(){
                 printErrorMessage('#validationErrorsBox', result);
             },
         });
-            
-           }
 
-    $(document).on('click','.data_sources_name',function(){
+    }
+
+    $(document).on('click', '.data_sources_name', function() {
         var id = $(this).attr('id');
         // var id = $('.data_sources_name').attr('id');
         var type = $(this).attr('type');
         $('#type_of_datasource').val(type);
         // $('.dataSourceType option[value="'+id+'"]').attr('selected','selected');
-    //    console.log(id);
-    // console.log(type);
-    // console.log(id);
+        //    console.log(id);
+        // console.log(type);
+        // console.log(id);
         $('#type_of_datasource_id').val(id);
-        $('.data_sources').css('background-color','#fff');
-        $('#data_sources'+id).css('background-color','#C8D0D5');
-        $('#delete_dataSourceField'+id).css('background-color','#C8D0D5');
+        $('.data_sources').css('background-color', '#fff');
+        $('#data_sources' + id).css('background-color', '#C8D0D5');
+        $('#delete_dataSourceField' + id).css('background-color', '#C8D0D5');
 
-        if(type=="Custom" || type=="Default"){
+        if (type == "Custom" || type == "Default") {
 
             fetch_DataSourceField(id);
-        }else{
+        } else {
             fetch_participantfield(id);
         }
-       
+
         // fetch_DataSourceField(id);
 
     });
 
-    $(document).on('click', '.delete_dataSourceField', function(){
+    $(document).on('click', '.delete_dataSourceField', function() {
         var id = $(this).data('id');
-        
-        var sourcetype=$('#type_of_datasource_id').val();
-        var type=$(this).data('type');
+
+        var sourcetype = $('#type_of_datasource_id').val();
+        var type = $(this).data('type');
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -720,62 +742,62 @@ $('select#data_source_type').change(function(){
             cancelButtonColor: '#d33',
             confirmButtonText: 'Yes, delete it!',
         }).then((result) => {
-            if (result.value){
+            if (result.value) {
                 $.ajax({
-                    url: 'usersdelete_dataSourceField/'+id,
-                    type: 'POST',
-                    data:{
-                        'source_id':sourcetype
-                    },
-                })
-                .done(function(response){
-                     swal.fire('Deleted!', "Data is deleted");
-                    //  console.log(type)
-                     if(type=="Participant"){
-                        fetch_participantfield(sourcetype);
-                     }else{
-                        fetch_DataSourceField(sourcetype);
-                     }
-                     
-                    // location.reload();
-                })
-                .fail(function(){
-                     swal.fire('Oops...', 'Something went wrong with ajax !', 'error');
-                });
+                        url: 'usersdelete_dataSourceField/' + id,
+                        type: 'POST',
+                        data: {
+                            'source_id': sourcetype
+                        },
+                    })
+                    .done(function(response) {
+                        swal.fire('Deleted!', "Data is deleted");
+                        //  console.log(type)
+                        if (type == "Participant") {
+                            fetch_participantfield(sourcetype);
+                        } else {
+                            fetch_DataSourceField(sourcetype);
+                        }
+
+                        // location.reload();
+                    })
+                    .fail(function() {
+                        swal.fire('Oops...', 'Something went wrong with ajax !', 'error');
+                    });
                 $("#result").val("");
             }
-        
+
 
         })
-   
-    
+
+
     });
 
-function fetch_participantfield(id){
-    $.ajaxSetup({
+    function fetch_participantfield(id) {
+        $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
         $.ajax({
-            url: 'Participant_field/'+id,
+            url: 'Participant_field/' + id,
             type: 'GET',
-           
+
             success: function success(result) {
                 if (result.success) {
                     // let participant = "Participant";
-                    var dataSourceName=result.data[0].name;
-                    var dataSourceid=result.data[0].id;
-                    let resp_data ="";
-                   let data=result.field;
+                    var dataSourceName = result.data[0].name;
+                    var dataSourceid = result.data[0].id;
+                    let resp_data = "";
+                    let data = result.field;
                     // let data2 = result.data[0].get_data_source_type;
                     //    console.log(dataSourceName);
-                      
+
                     $.each(data, function(key, val) {
                         // console.log(val.dataSourceName);
-                      var status=val.status;
-                      if(status==1){
-                       resp_data+= ` 
+                        var status = val.status;
+                        if (status == 1) {
+                            resp_data += ` 
                        <div class="row data_source_field" id="data_source_field${val.id}">
                            <div class="col-10" style="cursor:pointer;">
                                <p class="data_source_type size" data-sourcetype="Participant" data-sourceName="${dataSourceName}" data-sourceid="${dataSourceid}" data-type="${val.dataSourceType}" id="${val.id}">${val.dataSourceName}</p>
@@ -787,9 +809,9 @@ function fetch_participantfield(id){
                                 </a>
                             </div>
                         </div>`;
-                      }
+                        }
                     })
-                   
+
                     $('.data_field').html(resp_data);
                 }
             },
@@ -797,63 +819,63 @@ function fetch_participantfield(id){
                 printErrorMessage('#validationErrorsBox', result);
             },
         });
-}
+    }
 
 
 
-$('#createDataSourceType').submit(function (event) {
-    var sourcetype=$('#type_of_datasource_id').val();
+    $('#createDataSourceType').submit(function(event) {
+        var sourcetype = $('#type_of_datasource_id').val();
 
-    event.preventDefault();
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-    $.ajax({
-        url: createDataSourceTypeUrl,
-        type: 'POST',
-        data: $(this).serialize(),
-        success: function success(result) {
-            if (result.success) {
-                displaySuccessMessage(result.message);
-                $('#createDataSourceTypeModal').modal('hide');
-                // location.reload();
-                console.log(result.field);
-                var dataSourceName=result.field[0].data_source_type;
-                console.log(dataSourceName)
-                if(dataSourceName==="Participant"){
-                    console.log("in if")
-                    fetch_participantfield(sourcetype);
-                }else{
-                    console.log("in else")
-                    fetch_DataSourceField(sourcetype);
-                }
-                $("#result").val();
+        event.preventDefault();
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
-            $("#result").val("");
-        },
-        error: function error(result) {
-            printErrorMessage('#validationErrorsBoxDST', result);
-        },
+        });
+        $.ajax({
+            url: createDataSourceTypeUrl,
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function success(result) {
+                if (result.success) {
+                    displaySuccessMessage(result.message);
+                    $('#createDataSourceTypeModal').modal('hide');
+                    // location.reload();
+                    console.log(result.field);
+                    var dataSourceName = result.field[0].data_source_type;
+                    console.log(dataSourceName)
+                    if (dataSourceName === "Participant") {
+                        console.log("in if")
+                        fetch_participantfield(sourcetype);
+                    } else {
+                        console.log("in else")
+                        fetch_DataSourceField(sourcetype);
+                    }
+                    $("#result").val();
+                }
+                $("#result").val("");
+            },
+            error: function error(result) {
+                printErrorMessage('#validationErrorsBoxDST', result);
+            },
+        });
+
+
     });
 
-    
-});
-   
-//get field option and show data source field option
+    //get field option and show data source field option
 
-    $(document).on('click','.data_source_type',function(){
+    $(document).on('click', '.data_source_type', function() {
         var id = $(this).attr('id');
-var source_id=$(this).attr('data-type')
-var sourcetype=$('#type_of_datasource_id').val();
+        var source_id = $(this).attr('data-type')
+        var sourcetype = $('#type_of_datasource_id').val();
         var text = $(this).text();
-        var dataSourceType=$(this).attr('data-sourceType');
-        var dataSourceName=$(this).attr('data-sourcename');
-       
+        var dataSourceType = $(this).attr('data-sourceType');
+        var dataSourceName = $(this).attr('data-sourcename');
+
         // console.log('datasourcetype ',dataSourceType,dataSourceName);
-        $('.data_source_field').css('background-color','#fff');
-        $('#data_source_field'+id).css('background-color','#C8D0D5');
+        $('.data_source_field').css('background-color', '#fff');
+        $('#data_source_field' + id).css('background-color', '#C8D0D5');
 
         // console.log(sourcetype)
 
@@ -863,23 +885,23 @@ var sourcetype=$('#type_of_datasource_id').val();
             }
         });
         $.ajax({
-            url: 'getDataSourceOption/'+text,
+            url: 'getDataSourceOption/' + text,
             type: 'GET',
-            data:{
-                'source_id':sourcetype
+            data: {
+                'source_id': sourcetype
             },
             success: function success(result) {
                 if (result.success) {
                     var data = result.data;
-                    var dataSourcetype=result.field[0].data_source_type;
+                    var dataSourcetype = result.field[0].data_source_type;
                     // console.log(dataSourcetype);
 
-                    var resp_data ="";
-                if(dataSourcetype=="Custom"){ 
-                     $.each(data, function(key, val) {
-                        // console.log(val.id);
-                        // console.log(val.data_source_type);
-                        resp_data+= `<div class="row data_source_option" id="data_source_option${val.id}">
+                    var resp_data = "";
+                    if (dataSourcetype == "Custom") {
+                        $.each(data, function(key, val) {
+                            // console.log(val.id);
+                            // console.log(val.data_source_type);
+                            resp_data += `<div class="row data_source_option" id="data_source_option${val.id}">
                             <div class="col-10" style="cursor:pointer;">
                                 <p class="data_source_options size" data-sourcetype="Custom" data-val="${val.option_value}" id="${val.id}">${val.option_name}</p>
                             </div>
@@ -891,11 +913,12 @@ var sourcetype=$('#type_of_datasource_id').val();
                                 @endif
                             </div>
                         </div>`
-                    })}else{
+                        })
+                    } else {
                         $.each(data, function(key, val) {
-                        // console.log(val.id);
-                        // console.log(val.data_source_type);
-                        resp_data+= `<div class="row data_source_option" id="data_source_option${val.id}">
+                            // console.log(val.id);
+                            // console.log(val.data_source_type);
+                            resp_data += `<div class="row data_source_option" id="data_source_option${val.id}">
                             <div class="col-10" style="cursor:pointer;">
                                 <p class="data_source_options size" data-sourcetype="Participant" data-val="${val.option_value}" id="${val.id}">${val.option_name}</p>
                             </div>
@@ -907,10 +930,10 @@ var sourcetype=$('#type_of_datasource_id').val();
                                 @endif
                             </div>
                         </div>`
-                    })
+                        })
                     }
-                      
-                    
+
+
                     $('.data_options').html(resp_data);
                 }
             },
@@ -920,31 +943,29 @@ var sourcetype=$('#type_of_datasource_id').val();
         });
 
         var text = $(this).text();
-    //    console.log(dataSourceName);
+        //    console.log(dataSourceName);
         $("#result").val(function() {
-            if(dataSourceType=="Custom"){
-                if($(this).val() == '') {
-                    return dataSourceName + '_'+ text;
+            if (dataSourceType == "Custom") {
+                if ($(this).val() == '') {
+                    return dataSourceName + '_' + text;
                 } else {
-                    return dataSourceName + '_'+ text;
+                    return dataSourceName + '_' + text;
                 }
-            }
-            else if(dataSourceType=="Default") {
-                if($(this).val() == '') {
+            } else if (dataSourceType == "Default") {
+                if ($(this).val() == '') {
                     return text;
                 } else {
                     return text;
                 }
-            }
-            else{
-                if($(this).val() == '') {
-                    return text  + '|'+ dataSourceName ;
+            } else {
+                if ($(this).val() == '') {
+                    return text + '|' + dataSourceName;
                 } else {
-                    return text + '|'+ dataSourceName ;
-                } 
+                    return text + '|' + dataSourceName;
+                }
             }
 
-            
+
             // if(dataSourceType=='Action'){
 
             //     if($(this).val() == '') {
@@ -952,7 +973,7 @@ var sourcetype=$('#type_of_datasource_id').val();
             //     } else {
             //         return dataSourceType+'_'+text + '_'+ dataSourceName;
             //     }
-            
+
             // }else if(dataSourceType=='matter_info' || dataSourceType=='crm_info' || dataSourceType=='FamilyLawDetail' || dataSourceType=='key_dates'){
 
             //     if($(this).val() == '') {
@@ -960,7 +981,7 @@ var sourcetype=$('#type_of_datasource_id').val();
             //     } else {
             //         return dataSourceName+ '|'+ text ;;
             //     }
-    
+
             // }else{
 
             //     if($(this).val() == '') {
@@ -969,21 +990,21 @@ var sourcetype=$('#type_of_datasource_id').val();
             //         return text;
             //     }
             // }
-            
+
         });
     });
 
     // Getting Data Source Options By Option Type
 
-    $(document).on('click','.field_option_icon',function(){
+    $(document).on('click', '.field_option_icon', function() {
         var id = $(this).attr('data-id');
-        var sourcetype=$('#type_of_datasource_id').val();
-        if(id=='Flip' ){
-        $(this).toggleClass("toggleclass");
+        var sourcetype = $('#type_of_datasource_id').val();
+        if (id == 'Flip') {
+            $(this).toggleClass("toggleclass");
         }
 
-        var className=$(this).is('.toggleclass');
-        
+        var className = $(this).is('.toggleclass');
+
 
         $.ajaxSetup({
             headers: {
@@ -991,19 +1012,21 @@ var sourcetype=$('#type_of_datasource_id').val();
             }
         });
         $.ajax({
-            url: 'getDataSourceOptionByType/'+id,
-            type: 'GET', data:{
-                'source_id':sourcetype
+            url: 'getDataSourceOptionByType/' + id,
+            type: 'GET',
+            data: {
+                'source_id': sourcetype
             },
             success: function success(result) {
                 if (result.success) {
                     var data = result.data;
-                    var resp_data ="";
-                    var dataSourcetype=result.field[0].data_source_type;
-                    if(dataSourcetype=="Custom"){  $.each(data, function(key, val) {
-                        if(id!='Flip' || className==true){
+                    var resp_data = "";
+                    var dataSourcetype = result.field[0].data_source_type;
+                    if (dataSourcetype == "Custom") {
+                        $.each(data, function(key, val) {
+                            if (id != 'Flip' || className == true) {
 
-                        resp_data+=`<div class="row data_source_option" id="data_source_option${val.id}">
+                                resp_data += `<div class="row data_source_option" id="data_source_option${val.id}">
                             <div class="col-10" style="cursor:pointer;">
                                 <p class="data_source_options size" data-sourcetype="Custom" data-val="${val.option_value}" id="${val.id}">${val.option_name}</p>
                             </div>
@@ -1016,9 +1039,8 @@ var sourcetype=$('#type_of_datasource_id').val();
                                 @endif
                             </div>
                         </div>`;
-                        }
-                        else{
-                            resp_data+= `<div class="row data_source_option" id="data_source_option${val.id}">
+                            } else {
+                                resp_data += `<div class="row data_source_option" id="data_source_option${val.id}">
                             <div class="col-10" style="cursor:pointer;">
                                 <p class="data_source_options size" data-sourcetype="Custom" data-val="${val.option_value}" id="${val.id}">${val.option_value}</p>
                             </div>
@@ -1030,12 +1052,13 @@ var sourcetype=$('#type_of_datasource_id').val();
                                 @endif
                             </div>
                         </div>`;
-                        }
-                    })}else(
+                            }
+                        })
+                    } else(
                         $.each(data, function(key, val) {
-                        if(id!='Flip' || className==true){
+                            if (id != 'Flip' || className == true) {
 
-                        resp_data+=`<div class="row data_source_option" id="data_source_option${val.id}">
+                                resp_data += `<div class="row data_source_option" id="data_source_option${val.id}">
                             <div class="col-10" style="cursor:pointer;">
                                 <p class="data_source_options size" data-sourcetype="Participant" data-val="${val.option_value}" id="${val.id}">${val.option_name}</p>
                             </div>
@@ -1048,9 +1071,8 @@ var sourcetype=$('#type_of_datasource_id').val();
                                 @endif
                             </div>
                         </div>`;
-                        }
-                        else{
-                            resp_data+= `<div class="row data_source_option" id="data_source_option${val.id}">
+                            } else {
+                                resp_data += `<div class="row data_source_option" id="data_source_option${val.id}">
                             <div class="col-10" style="cursor:pointer;">
                                 <p class="data_source_options size" data-sourcetype="Participant" data-val="${val.option_value}" id="${val.id}">${val.option_value}</p>
                             </div>
@@ -1062,20 +1084,17 @@ var sourcetype=$('#type_of_datasource_id').val();
                                 @endif
                             </div>
                         </div>`;
-                        }
-                    })
+                            }
+                        })
                     )
-                   
+
                     $('.data_options').html(resp_data);
                 }
             },
-           
+
         });
     });
+</script>
 
 
-  
-    </script>
-
-    
 @endsection

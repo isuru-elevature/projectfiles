@@ -86,7 +86,7 @@ class DataSourceController extends Controller
     $dataSources = DataSource::all();
 
     // Hardcoded access token (replace with your actual token)
-    $accessToken = 'YOUR_ACCESS_TOKEN';
+    $accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhIjoiTTJNM016TTVPVGxoWVRBNU1HSTFOalkwTlRneE1EUmtObUl6TmpsbU9UTTJZVFkxT0RabVpqVTNZV00wIiwiYiI6Im5ld3N0YWZmZWxlIiwiYyI6IjEwLjExLjIxLjMyIiwiZyI6IlQxNi0xMjQtMCIsImUiOiJGIiwiZiI6IkV1cm9wZVwvTG9uZG9uIiwiaCI6ImIiLCJkIjoiIiwibmJmIjoxNjk4Nzk5MDAwLCJleHAiOjE2OTg4Mjc4MTB9.kLQ5x942FsnA6RzsyZZNMTCs5y-acqdVgG8PO898rO5qC8iQjRvUtEiudCs1ElyRUkjiaeq2flMCbCXYiQdNg1mNMwEZPtn9wG7dt3l29kMKSQgvcPj2RwewCrShsebqP_6sVxFEZBLZrVHIUUkWuOlWKmQ56dNcPsv62SQdkzg1Y2QwXneO7SsLhas156EzUI2DlmYlYXMkm5GcgyyrmNHcOuESo222G1smrhcHr-isX4jnx3Q_P9wI_9TdOhfEUVL1imulQhNO6FpyY9gm7jRzrdxZIGv_-_-Ab9tzg1-Z7VOtZoTknXnjdtQq_r0ZzrZkyTeX5JxfNI_XRUVOoA';
 
     // API URLs
     $apiUrl = 'https://ap-southeast-2.actionstep.com/api/rest/actiontypes';
@@ -98,11 +98,68 @@ class DataSourceController extends Controller
     $dataCollectionsData = $this->makeApiRequest($datacollectionsUrl, $accessToken);
     $dataCollectionsFieldsData = $this->makeApiRequest($datacollectionsFieldsUrl, $accessToken);
 
-    return view('dashboard', [
+     // Organize data collections by action type
+    //  $actionTypesWithDataCollections = [];
+    //  if (isset($dataCollectionsData['datacollections'])) {
+    //      foreach ($dataCollectionsData['datacollections'] as $dataCollection) {
+    //          $actionTypeId = $dataCollection['links']['actionType'] ?? null;
+    //          if ($actionTypeId) {
+    //              $actionTypesWithDataCollections[$actionTypeId][] = $dataCollection['label'];
+    //          }
+    //      }
+    //  }
+    $actionTypesWithDataCollections = [];
+    // foreach ($dataCollectionsData['datacollections'] as $collection) {
+    //     $actionTypeId = $collection['links']['actionType'] ?? null;
+    //     if ($actionTypeId && isset($actionstepData['actiontypes'][$actionTypeId])) {
+    //         $actionTypeName = $actionstepData['actiontypes'][$actionTypeId]['name'];
+    //         $actionTypesWithDataCollections[$actionTypeId][$collection['label']] = $collection['id'];
+    //     }
+    // }
+
+    foreach ($dataCollectionsData['datacollections'] as $collection) {
+        $actionTypeId = $collection['links']['actionType'] ?? null;
+        if ($actionTypeId) {
+            foreach ($actionstepData['actiontypes'] as $actionType) {
+                if ($actionType['id'] == $actionTypeId) {
+                    $actionTypeName = $actionType['name'];
+                    $actionTypesWithDataCollections[$actionTypeId][$collection['label']] = $collection['id'];
+                    break;
+                }
+            }
+        }
+    }
+    
+
+
+        // Filter out fields with dataType HtmlReadOnly and organize by data collection ID
+    // $dataCollectionFieldsByCollection = [];
+    // if (isset($dataCollectionFieldsData['datacollectionfields'])) {
+    //     foreach ($dataCollectionFieldsData['datacollectionfields'] as $field) {
+    //          if ($field['dataType'] !== 'HtmlReadOnly') {
+    //             $dataCollectionId = $field['links']['dataCollection'] ?? null;
+    //             if ($dataCollectionId) {
+    //                 $dataCollectionFieldsByCollection[$dataCollectionId][] = $field['label'];
+    //             }
+    //         }
+    //     }
+    // }
+
+    $dataCollectionFieldsByCollection = [];
+    foreach ($dataCollectionsFieldsData['datacollectionfields'] as $field) {
+        $dataCollectionId = $field['links']['dataCollection'] ?? null;
+        if ($field['dataType'] !== 'HtmlReadOnly') {
+        if ($dataCollectionId) {
+            $dataCollectionFieldsByCollection[$dataCollectionId][] = $field['label'];
+        }
+    }
+    }
+
+    return view('DataSource.index', [
         'dataSources' => $dataSources,
         'actionstepData' => $actionstepData,
-        'dataCollectionsData' => $dataCollectionsData,
-        'dataCollectionsFieldsData' => $dataCollectionsFieldsData
+        'actionTypesWithDataCollections' => $actionTypesWithDataCollections,
+        'dataCollectionFieldsByCollection' => $dataCollectionFieldsByCollection
     ]);
 }
 
