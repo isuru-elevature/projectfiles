@@ -78,6 +78,11 @@
                 <div class="card ">
                     <div class="card-body p-0 px-2">
                         <div class="data-source">
+                        <script>
+                            var actionstepData = @json($dataSources);
+
+                            console.log(actionstepData);
+                        </script>
                            
                         @foreach($dataSources as $data)
                         @if($data->status==1)
@@ -114,21 +119,25 @@
             <div class="card ">
                 <div class="card-body p-0 px-2">
                     <div class="data-source">
+                        <script>
+                            var actionstepData = @json($dataCollectionFieldsByCollection);
+
+                            console.log(actionstepData);
+                        </script>
 
                         @if(isset($actionstepData['actiontypes']) && is_array($actionstepData['actiontypes']))
                         @foreach($actionstepData['actiontypes'] as $actionType)
-                        <!-- Check if there are data collections for this action type -->
                         @if(isset($actionTypesWithDataCollections[$actionType['id']]) && count($actionTypesWithDataCollections[$actionType['id']]) > 0)
-                        <!-- Loop through each data collection label -->
+
+
                         @foreach($actionTypesWithDataCollections[$actionType['id']] as $dataCollectionLabel => $dataCollectionId)
                         <div class="row data_sources" data-collection-id="{{ $dataCollectionId }}">
                             <div class="col-12">
-                                <p class="data_sources_name size" onclick="showFieldsForCollection('{{ $dataCollectionId }}')">{{ $actionType['name'] }} - {{ $dataCollectionLabel }}</p>
+                                <p class="data_sources_name size" onclick="showFieldsForCollection('{{ $dataCollectionId }}')" type="Custom" id="{{$actionType['id']}}">{{ $actionType['name'] }} - {{ $dataCollectionLabel }}</p>
                             </div>
                         </div>
                         @endforeach
                         @else
-                        <!-- Display the action type name even if there are no data collections -->
                         <div class="row data_sources">
                             <div class="col-12">
                                 <p class="data_sources_name size">{{ $actionType['name'] }}</p>
@@ -143,7 +152,6 @@
                     </div>
                 </div>
             </div>
-            <!-- Other content -->
         </div>
 
 
@@ -245,13 +253,27 @@
         var fields = @json($dataCollectionFieldsByCollection);
         var fieldContainer = document.querySelector('.data_field');
         fieldContainer.innerHTML = ''; // Clear existing fields
-
         // Check if fields for the collection exist and have elements
         if (fields[collectionId] && fields[collectionId].length > 0) {
-            fields[collectionId].forEach(function(label) {
-                var p = document.createElement('p');
-                p.textContent = label;
-                fieldContainer.appendChild(p);
+            resp_data = ""
+            fields[collectionId].forEach(field => {
+                console.log(field)
+                resp_data += `
+                    <div class="row data_source_field" id="data_source_field${collectionId}">
+                        <div class="col-10" style="cursor:pointer;">
+                            <p class="data_source_type size" data-sourcetype="Custom" data-sourceName="${field}" data-type="${field}" id="${collectionId}">${field}</p>
+                        </div>
+                        <div class="col-2">
+                            <button class="delete_dataSourceField" data-type="${field}"  data-id="${collectionId}"><i class="fa fa-trash color" aria-hidden="true"></i></button>
+                            <a id="${collectionId}" class="edit_data_source_type_btn">
+                            <img src="{{asset('public/images/Icons/edit.svg')}}" class="editIcon d-inline float-end border ms-1"  alt="edit" title="edit">
+                            </a>
+                        </div>
+                    </div>`
+                // var p = document.createElement('p');
+                // p.textContent = label;
+                // fieldContainer.appendChild(resp_data);
+                $('.data_field').html(resp_data);
             });
         } else {
             fieldContainer.innerHTML = '<p>No fields available for this selection.</p>';
@@ -698,30 +720,30 @@
 
     }
 
-    $(document).on('click', '.data_sources_name', function() {
-        var id = $(this).attr('id');
-        // var id = $('.data_sources_name').attr('id');
-        var type = $(this).attr('type');
-        $('#type_of_datasource').val(type);
-        // $('.dataSourceType option[value="'+id+'"]').attr('selected','selected');
-        //    console.log(id);
-        // console.log(type);
-        // console.log(id);
-        $('#type_of_datasource_id').val(id);
-        $('.data_sources').css('background-color', '#fff');
-        $('#data_sources' + id).css('background-color', '#C8D0D5');
-        $('#delete_dataSourceField' + id).css('background-color', '#C8D0D5');
+    // $(document).on('click', '.data_sources_name', function() {
+    //     var id = $(this).attr('id');
+    //     // var id = $('.data_sources_name').attr('id');
+    //     var type = $(this).attr('type');
 
-        if (type == "Custom" || type == "Default") {
+    //     $('#type_of_datasource').val(type);
+    //     // $('.dataSourceType option[value="'+id+'"]').attr('selected','selected');
+    //     //    console.log(id);
+    //     // console.log(type);
+    //     // console.log(id);
+    //     $('#type_of_datasource_id').val(id);
+    //     $('.data_sources').css('background-color', '#fff');
+    //     $('#data_sources' + id).css('background-color', '#C8D0D5');
+    //     $('#delete_dataSourceField' + id).css('background-color', '#C8D0D5');
 
-            fetch_DataSourceField(id);
-        } else {
-            fetch_participantfield(id);
-        }
+    //     if (type == "Custom" || type == "Default") {
+    //         fetch_DataSourceField(id);
+    //     } else {
+    //         fetch_participantfield(id);
+    //     }
 
-        // fetch_DataSourceField(id);
+    //     // fetch_DataSourceField(id);
 
-    });
+    // });
 
     $(document).on('click', '.delete_dataSourceField', function() {
         var id = $(this).data('id');
