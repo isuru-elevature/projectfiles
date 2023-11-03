@@ -1,0 +1,145 @@
+{
+    "links": {
+        "datacollectionfields.dataCollection": {
+            "href": "https://ap-southeast-2.actionstep.com.actionstep.com/api/rest/datacollections/{datacollectionfields.dataCollection}",
+            "type": "datacollections"
+        },
+        "datacollectionfields.tag": {
+            "href": "https://ap-southeast-2.actionstep.com.actionstep.com/api/rest/tags/{datacollectionfields.tag}",
+            "type": "tags"
+        }
+    },
+    "datacollectionfields": [
+        {
+            "id": "30--FamCourtAus",
+            "name": "FamCourtAus",
+            "dataType": "Boolean",
+            "label": "Family Court of Australia",
+            "formOrder": 70,
+            "listOrder": 70,
+            "required": "F",
+            "description": null,
+            "customHtmlBelow": null,
+            "customHtmlAbove": null,
+            "links": { "dataCollection": "30", "tag": null }
+        },
+        {
+            "id": "30--FamCourtWestAus",
+            "name": "FamCourtWestAus",
+            "dataType": "Boolean",
+            "label": "Family Court of Western Australia",
+            "formOrder": 80,
+            "listOrder": 80,
+            "required": "F",
+            "description": null,
+            "customHtmlBelow": null,
+            "customHtmlAbove": null,
+            "links": { "dataCollection": "30", "tag": null }
+        },
+        {
+            "id": "30--FedCourtAus",
+            "name": "FedCourtAus",
+            "dataType": "Boolean",
+            "label": "Federal Circuit Court of Australia",
+            "formOrder": 85,
+            "listOrder": 85,
+            "required": "F",
+            "description": null,
+            "customHtmlBelow": null,
+            "customHtmlAbove": null,
+            "links": { "dataCollection": "30", "tag": null }
+        },
+        {
+            "id": "30--FileNumber",
+            "name": "FileNumber",
+            "dataType": "Str255",
+            "label": "Court File Number",
+            "formOrder": 30,
+            "listOrder": 30,
+            "required": "F",
+            "description": null,
+            "customHtmlBelow": null,
+            "customHtmlAbove": null,
+            "links": { "dataCollection": "30", "tag": null }
+        },
+        {
+            "id": "30--FilingFee",
+            "name": "FilingFee",
+            "dataType": "Str255",
+            "label": "Court Filing Fee",
+            "formOrder": 40,
+            "listOrder": 40,
+            "required": "F",
+            "description": null,
+            "customHtmlBelow": null,
+            "customHtmlAbove": null,
+            "links": { "dataCollection": "30", "tag": null }
+        },
+        {
+            "id": "30--NextCourtDate",
+            "name": "NextCourtDate",
+            "dataType": "DateTimeNM",
+            "label": "Next Court Date",
+            "formOrder": 50,
+            "listOrder": 50,
+            "required": "F",
+            "description": null,
+            "customHtmlBelow": null,
+            "customHtmlAbove": null,
+            "links": { "dataCollection": "30", "tag": null }
+        },
+        {
+            "id": "30--OthrCourt",
+            "name": "OthrCourt",
+            "dataType": "Str255",
+            "label": "Other",
+            "formOrder": 90,
+            "listOrder": 90,
+            "required": "F",
+            "description": "Specify the name of the Court this is filed in.",
+            "customHtmlBelow": null,
+            "customHtmlAbove": null,
+            "links": { "dataCollection": "30", "tag": null }
+        },
+        {
+            "id": "30--Registry",
+            "name": "Registry",
+            "dataType": "Str255",
+            "label": "Registry",
+            "formOrder": 60,
+            "listOrder": 60,
+            "required": "F",
+            "description": null,
+            "customHtmlBelow": "",
+            "customHtmlAbove": null,
+            "links": { "dataCollection": "30", "tag": null }
+        }
+    ],
+    "meta": {
+        "paging": {
+            "datacollectionfields": {
+                "recordCount": 8,
+                "pageCount": 1,
+                "page": 1,
+                "pageSize": 50,
+                "prevPage": null,
+                "nextPage": null
+            }
+        },
+        "debug": {
+            "requestTime": "0.059792",
+            "mem": "1.04mb",
+            "server": "app-a8547c63a0da4a0eba3c8178bc9663321020546733.ap-southeast-2.actionstep.com",
+            "cb": "T16-124-0",
+            "time": "2023-11-03 10:30:50 +1000 (Australia/Brisbane)",
+            "appload": "0.70, 0.56, 0.62",
+            "app": "0.022487",
+            "db": "0.037305",
+            "dbc": "0.009960",
+            "qc": "40",
+            "uqc": "28",
+            "fc": "128",
+            "rl": null
+        }
+    }
+}

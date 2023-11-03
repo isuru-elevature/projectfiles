@@ -73,7 +73,7 @@
     <div class="row">
 
 
-        <!-- <div class="col-lg-4 col-md-6 col-sm-12">
+        <!-- {{-- <div class="col-lg-4 col-md-6 col-sm-12">
                 <label for="">Select Data Source</label>
                 <div class="card ">
                     <div class="card-body p-0 px-2">
@@ -112,9 +112,9 @@
               
                     <a href="#" class="btn btn-sm float-start my-3 create_btn" data-bs-toggle="modal" data-bs-target="#createDataSourceModal"><i class="fa fa fa-plus"></i> CREATE DATA SOURCE</a>
               
-            </div> -->
+            </div> --}} -->
 
-        <div class="col-lg-4 col-md-6 col-sm-12">
+        <!-- {{-- <div class="col-lg-4 col-md-6 col-sm-12">
             <label for="">Select Data Source</label>
             <div class="card ">
                 <div class="card-body p-0 px-2">
@@ -149,6 +149,88 @@
                         <p>No Action Types available.</p>
                         @endif
 
+                    </div>
+                </div>
+            </div>
+        </div> --}} -->
+        <div class="col-lg-4 col-md-6 col-sm-12">
+            <label for="">Select Data Source</label>
+            <div class="card ">
+                <div class="card-body p-0 px-2">
+                    <div class="data-source">
+
+                        @if(isset($actionstepData['actiontypes']) && is_array($actionstepData['actiontypes']))
+                        @foreach($actionstepData['actiontypes'] as $actionType)
+                        @if(isset($actionTypesWithDataCollections[$actionType['id']]) && count($actionTypesWithDataCollections[$actionType['id']]) > 0)
+                        @foreach($actionTypesWithDataCollections[$actionType['id']] as $dataCollectionLabel => $dataCollectionId)
+                        <div class="row data_sources" id="data_sources{{$actionType['id'] . '_' . $dataCollectionId}}">
+                            <div class="col-10" style="cursor:pointer;">
+                                <!-- <p class="data_sources_name size" onclick="fetch_DataSourceField('{{ $actionType['id'] }}')" type="Custom" id="{{$actionType['id']}}">{{ $actionType['name'] }} - {{ $dataCollectionLabel }}</p> -->
+                                <p class="data_sources_name size" type="Actionstep" id="{{$actionType['id']}}" data-collection-id="{{ $dataCollectionId }}">{{ $actionType['name'] }} - {{ $dataCollectionLabel }}</p>
+                            </div>
+                            <div class="col-2">
+
+                            </div>
+                        </div>
+                        @endforeach
+                        @endif
+                        @endforeach
+                        @else
+                        <p>No Action Types available.</p>
+                        @endif
+
+                        <!-- {{-- 
+                        @if(isset($participantTypesWithFields) && is_array($participantTypesWithFields))
+                        @foreach($participantTypesWithFields as $participantTypeName => $fields)
+                        <div class="row data_sources" id="participant_type_{{ Str::slug($participantTypeName) }}">
+                            <div class="col-10" style="cursor:pointer;">
+                            <p class="data_sources_name size" type="Participant" data-participant-type-name="{{ $participantTypeName }}" id="participant_{{ Str::slug($participantTypeName) }}">
+                               
+
+                                    Participant - {{ $participantTypeName }}
+                                </p>
+                            </div>
+                            <div class="col-2">
+                            
+                            </div>
+                        </div>
+                        
+                        
+                        @foreach($fields as $fieldLabel)
+                        <div class="row data_source_field" id="field_{{ Str::slug($fieldLabel) }}">
+                            <div class="col-12">
+                                <p class="field_name size">{{ $fieldLabel }}</p>
+                            </div>
+                        </div>
+                        @endforeach
+                        @endforeach
+                        @else
+                        <p>No Participant Types available.</p>
+                        @endif
+                        --}} -->
+
+                        <!-- <script>
+                            var participantTypesWithFields = @json($participantTypesWithFields);
+                            console.log(participantTypesWithFields);
+                        </script> -->
+
+                        @if(isset($participantTypesWithFields))
+                        @foreach($participantTypesWithFields as $participantTypeId => $participantType)
+
+                        <div class="row data_sources" id="participant_type{{ $participantTypeId }}">
+                            <div class="col-10" style="cursor:pointer;">
+                                <p class="data_sources_name size" type="ActionstepParticipant" data-collection-id="{{ $participantTypeId }}" id="participant_type{{ $participantTypeId }}">
+                                    Participant - {{ $participantType['name'] }}
+                                </p>
+                            </div>
+                            <div class="col-2">
+
+                            </div>
+                        </div>
+                        @endforeach
+                        @else
+                        <p>No Participant Types available.</p>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -249,37 +331,6 @@
     </footer> -->
 
 <script>
-    function showFieldsForCollection(collectionId) {
-        var fields = @json($dataCollectionFieldsByCollection);
-        var fieldContainer = document.querySelector('.data_field');
-        fieldContainer.innerHTML = ''; // Clear existing fields
-        // Check if fields for the collection exist and have elements
-        if (fields[collectionId] && fields[collectionId].length > 0) {
-            resp_data = ""
-            fields[collectionId].forEach(field => {
-                console.log(field)
-                resp_data += `
-                    <div class="row data_source_field" id="data_source_field${collectionId}">
-                        <div class="col-10" style="cursor:pointer;">
-                            <p class="data_source_type size" data-sourcetype="Custom" data-sourceName="${field}" data-type="${field}" id="${collectionId}">${field}</p>
-                        </div>
-                        <div class="col-2">
-                            <button class="delete_dataSourceField" data-type="${field}"  data-id="${collectionId}"><i class="fa fa-trash color" aria-hidden="true"></i></button>
-                            <a id="${collectionId}" class="edit_data_source_type_btn">
-                            <img src="{{asset('public/images/Icons/edit.svg')}}" class="editIcon d-inline float-end border ms-1"  alt="edit" title="edit">
-                            </a>
-                        </div>
-                    </div>`
-                // var p = document.createElement('p');
-                // p.textContent = label;
-                // fieldContainer.appendChild(resp_data);
-                $('.data_field').html(resp_data);
-            });
-        } else {
-            fieldContainer.innerHTML = '<p>No fields available for this selection.</p>';
-        }
-    }
-
     // console.log(data);
     $(document).on('click', '.create_btn', function() {
         document.getElementById("delete_id").value = "";
@@ -339,6 +390,7 @@
         });
 
     }
+
     $('select#data_source_type').change(function() {
         // document.getElementById("type_of_datasource").value = value;
         var aa = $(this).find(':selected').data('sourcetype');
@@ -365,8 +417,6 @@
         })
 
     }
-
-
 
     $(document).on('click', '.delete_dataSource', function() {
         var id = $(this).data('id');
@@ -445,8 +495,6 @@
 
     }
 
-
-
     $('#createDataSource').submit(function(event) {
 
         event.preventDefault();
@@ -515,7 +563,6 @@
         }
         getHistory();
 
-
         $(document).on('click', '.deleteResult', function() {
             var id = $(this).attr('id');
 
@@ -554,6 +601,7 @@
             })
 
         });
+
         //update data source 
         $(document).on('click', '.edit_data_source', function() {
             var id = $(this).attr('id');
@@ -649,7 +697,247 @@
     });
 </script>
 
+
 <script>
+    function fetch_ActionstepSourceField(collectionId) {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        $.ajax({
+            url: 'getActionstepCollection/' + collectionId,
+            type: 'GET',
+
+            success: function success(result) {
+                if (result.success) {
+                    let dataCollection = result.data.datacollectionfields
+                    console.log(result)
+                    if (dataCollection.length > 0) {
+                        let resp_data = "";
+                        dataCollection.forEach(field => {
+                            resp_data += `
+                                        <div class="row data_source_field" id="data_source_field${field.id}">
+                                            <div class="col-10" style="cursor:pointer;">
+                                                <p class="data_source_type size" data-sourcetype="Custom" data-sourceName="${field.name}" data-type="${field.dataType}" id="${field.id}">${field.label}</p>
+                                            </div>
+                                        </div>`;
+                        });
+                        $('.data_field').html(resp_data);
+                    } else {
+                        $('.data_field').html('<p>No fields available for this selection.</p>');
+                    }
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', xhr, status, error);
+                // If printErrorMessage expects an error message string, you need to provide that.
+                // For example, if the expected error message is in xhr.responseText:
+                let errorMessage = xhr.responseText || "An unknown error occurred";
+                printErrorMessage('#validationErrorsBox', errorMessage);
+            },
+        });
+
+        // var fields = @json($dataCollectionFieldsByCollection);
+        // console.log(fields);
+        // var fieldContainer = document.querySelector('.data_field');
+        // fieldContainer.innerHTML = '';
+
+        // if (fields[collectionId] && fields[collectionId].length > 0) {
+        //     let resp_data = "";
+        //     console.log(fields)
+        //     fields[collectionId].forEach(field => {
+        //         resp_data += `
+        //         <div class="row data_source_field" id="data_source_field${field.id}">
+        //             <div class="col-10" style="cursor:pointer;">
+        //                 <p class="data_source_type size" data-sourcetype="Actionstep" data-sourceName="${field.name}" data-type="${field.name}" id="${field.id}">${field.name}</p>
+        //             </div>
+        //         </div>`;
+        //     });
+        //     $('.data_field').html(resp_data);
+        // } else {
+        //     fieldContainer.innerHTML = '<p>No fields available for this selection.</p>';
+        // }
+    }
+    /*
+        function fetch_ActionstepParticipantField(participantTypeId) {
+            var fieldsData = @json($participantTypesWithFields);
+            console.log(fieldsData)
+            var participantFields = fieldsData[participantTypeId] ? fieldsData[participantTypeId]['fields'] : null;
+
+            if (participantFields) {
+                let resp_data = "";
+                // Check if participantFields is an array and has elements
+                if (Array.isArray(participantFields) && participantFields.length > 0) {
+                    participantFields.forEach(field => {
+                        resp_data += buildFieldHtml(field, field); // Assuming field is a string here
+                    });
+                } else if (typeof participantFields === 'object' && Object.keys(participantFields).length > 0) {
+                    // If it's an object, iterate over the object keys
+                    Object.entries(participantFields).forEach(([key, value]) => {
+                        resp_data += buildFieldHtml(key, value);
+                    });
+                } else {
+                    // If there are no fields
+                    $('.data_field').html('<p>No fields available for this selection.</p>');
+                    return;
+                }
+                $('.data_field').html(resp_data);
+            } else {
+                $('.data_field').html('<p>No fields available for this selection.</p>');
+            }
+        }
+        */
+
+    function fetch_ActionstepParticipantField(id) {
+
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        $.ajax({
+            url: 'getActionstepParticipantCollection/' + id,
+            type: 'GET',
+            success: function success(result) {
+                if (result.success) {
+                    if (result.data && result.data.participanttypedatafields.length > 0) {
+
+                        let resp_data = "";
+
+                        result.data.participanttypedatafields.forEach(field => {
+                            resp_data += `
+                            <div class="row data_source_field" id="data_source_field${field.id}">
+                                <div class="col-10" style="cursor:pointer;">
+                                    <p class="data_source_type size" data-sourcetype="ActionstepParticipant" data-sourceName="${field.label}" data-type="${field.dataType}" id="${field.id}">${field.label}</p>
+                                </div>
+                            </div>`;
+                        });
+                        $('.data_field').html(resp_data);
+                    } else {
+                        $('.data_field').html('<p class="size">No custom fields available for this participant type.</p>');
+                    }
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', xhr, status, error);
+                let errorMessage = xhr.responseText || "An unknown error occurred";
+                printErrorMessage('#validationErrorsBox', errorMessage);
+            },
+        });
+
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        $.ajax({
+            url: 'Participant_field/' + id,
+            type: 'GET',
+            success: function success(result) {
+                if (result.success) {
+                    let resp_data = "";
+                    let fields = result.field;
+
+                    fields.forEach(field => {
+                        // Assuming 'field' has properties like 'dataSourceName', 'id', etc.
+                        resp_data += ` 
+                    <div class="row data_source_field" id="data_source_field${field.id}">
+                        <div class="col-10" style="cursor:pointer;">
+                            <p class="data_source_type size" data-sourcetype="Participant" data-sourceName="${field.dataSourceName}" data-sourceid="${id}" data-type="${field.dataSourceType}" id="${field.id}">${field.dataSourceName}</p>
+                        </div>
+                        <div class="col-2">
+                             <button class="delete_dataSourceField" data-type="${field.dataSourceType}" data-sourceid="${id}" data-id="${field.id}"><i class="fa fa-trash color" aria-hidden="true"></i></button>
+                             <a id="${field.id}" class="edit_data_source_type_btn" data-sourceid="${id}">
+                             <img src="{{asset('public/images/Icons/edit.svg')}}" class="editIcon d-inline float-end border ms-1"  alt="edit" title="edit">
+                             </a>
+                         </div>
+                     </div>`;
+                    });
+
+                    $('.data_field').after(resp_data);
+                }
+            },
+            error: function error(result) {
+                db_success = false
+                printErrorMessage('#validationErrorsBox', result);
+            },
+        });
+    }
+
+
+    function buildFieldHtml(id, name) {
+        return `
+        <div class="row data_source_field" id="data_source_field${id}">
+            <div class="col-10" style="cursor:pointer;">
+                <p class="data_source_type size" data-sourcetype="Actionstep" data-sourceName="${name}" data-type="${name}" id="${id}">${name}</p>
+            </div>
+        </div>`;
+    }
+
+    /*
+        // function fetch_ActionstepParticipantField(participantTypeId) {
+        //     var fields = @json($participantTypesWithFields);
+        //     console.log(fields)
+        //     if (fields[participantTypeId] && Object.keys(fields[participantTypeId]['fields']).length > 0) {
+        //         let resp_data = "";
+        //         fields[participantTypeId]['fields'].forEach(field => {
+        //             resp_data += `
+        //             <div class="row data_source_field" id="data_source_field${field.id}">
+        //                 <div class="col-10" style="cursor:pointer;">
+        //                     <p class="data_source_type size" data-sourcetype="Actionstep" data-sourceName="${field.name}" data-type="${field.name}" id="${field.id}">${field.name}</p>
+        //                 </div>
+        //             </div>`;
+        //         });
+        //         $('.data_field').html(resp_data);
+        //     } else {
+        //         $('.data_field').html('<p>No fields available for this selection.</p>');
+        //     }
+
+            // $.ajaxSetup({
+            //     headers: {
+            //         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            //     }
+            // });
+
+            // // Assuming you have a route set up to fetch participant fields by ID
+            // $.ajax({
+            //     url: 'getActionstepParticipantFields/' + participantTypeId,
+
+            //     type: 'GET',
+            //     success: function(response) {
+            //         if (response.success) {
+            //             var fields = response.fields; // Adjust this based on the actual response structure
+            //             var fieldContainer = $('.data_field');
+            //             fieldContainer.empty();
+
+            //             if (fields && fields.length > 0) {
+            //                 let resp_data = "";
+            //                 fields.forEach(field => {
+            //                     resp_data += `
+            //                     <div class="row data_source_field" id="data_source_field${field.id}">
+            //                         <div class="col-10" style="cursor:pointer;">
+            //                             <p class="data_source_type size" data-sourcetype="Participant" data-sourceName="${field.name}" data-type="${field.name}" id="${field.id}">${field.name}</p>
+            //                         </div>
+            //                     </div>`;
+            //                 });
+            //                 fieldContainer.html(resp_data);
+            //             } else {
+            //                 fieldContainer.html('<p>No fields available for this participant type.</p>');
+            //             }
+            //         }
+            //     },
+            //     error: function(xhr, status, error) {
+            //         console.error('AJAX Error:', xhr, status, error);
+            //         let errorMessage = xhr.responseText || "An unknown error occurred";
+            //         // Handle the error, e.g., display a message to the user
+            //     }
+            // });
+        
+    */
+
     //get field and show data source field
     function fetch_DataSourceField(id) {
         $.ajaxSetup({
@@ -665,6 +953,7 @@
                 if (result.success) {
                     let participant = result.data[0].data_source_type;
                     let dataSourceName = result.data[0].name;
+                    console.log("dataSourceName", dataSourceName);
                     let resp_data = "";
                     let data = result.field;
                     let data2 = result.data[0].get_data_source_type;
@@ -717,33 +1006,99 @@
                 printErrorMessage('#validationErrorsBox', result);
             },
         });
-
     }
 
-    // $(document).on('click', '.data_sources_name', function() {
-    //     var id = $(this).attr('id');
-    //     // var id = $('.data_sources_name').attr('id');
-    //     var type = $(this).attr('type');
+    // {{--  function fetch_participantfield(id) {
+    //     $.ajaxSetup({
+    //         headers: {
+    //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    //         }
+    //     });
+    //     $.ajax({
+    //         url: 'Participant_field/' + id,
+    //         type: 'GET',
 
-    //     $('#type_of_datasource').val(type);
-    //     // $('.dataSourceType option[value="'+id+'"]').attr('selected','selected');
-    //     //    console.log(id);
-    //     // console.log(type);
-    //     // console.log(id);
-    //     $('#type_of_datasource_id').val(id);
-    //     $('.data_sources').css('background-color', '#fff');
-    //     $('#data_sources' + id).css('background-color', '#C8D0D5');
-    //     $('#delete_dataSourceField' + id).css('background-color', '#C8D0D5');
+    //         success: function success(result) {
+    //             console.log(result);
+    //             if (result.success) {
+    //                 // let participant = "Participant";
+    //                 var dataSourceName = result.data[0].name;
+    //                 var dataSourceid = result.data[0].id;
 
-    //     if (type == "Custom" || type == "Default") {
-    //         fetch_DataSourceField(id);
-    //     } else {
-    //         fetch_participantfield(id);
-    //     }
 
-    //     // fetch_DataSourceField(id);
+    //                 let resp_data = "";
+    //                 let data = result.field;
+    //                 // let data2 = result.data[0].get_data_source_type;
+    //                 //    console.log(dataSourceName);
 
-    // });
+    //                 $.each(data, function(key, val) {
+    //                     // console.log(val.dataSourceName);
+    //                     var status = val.status;
+    //                     if (status == 1) {
+    //                         resp_data += ` 
+    //                    <div class="row data_source_field" id="data_source_field${val.id}">
+    //                        <div class="col-10" style="cursor:pointer;">
+    //                            <p class="data_source_type size" data-sourcetype="Participant" data-sourceName="${dataSourceName}" data-sourceid="${dataSourceid}" data-type="${val.dataSourceType}" id="${val.id}">${val.dataSourceName}</p>
+    //                        </div>
+    //                        <div class="col-2">
+    //                             <button class="delete_dataSourceField" data-type="${val.dataSourceType}" data-sourceid="${dataSourceid}" data-id="${val.id}"><i class="fa fa-trash color" aria-hidden="true"></i></button>
+    //                             <a id="${val.id}" class="edit_data_source_type_btn" data-sourceid="${dataSourceid}">
+    //                             <img src="{{asset('public/images/Icons/edit.svg')}}" class="editIcon d-inline float-end border ms-1"  alt="edit" title="edit">
+    //                             </a>
+    //                         </div>
+    //                     </div>`;
+    //                     }
+    //                 })
+
+    //                 $('.data_field').html(resp_data);
+    //             }
+    //         },
+    //         error: function error(result) {
+    //             printErrorMessage('#validationErrorsBox', result);
+    //         },
+    //     });
+    // } --}}
+
+    function fetch_participantfield(id) {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        $.ajax({
+            url: 'Participant_field/' + id,
+            type: 'GET',
+            success: function success(result) {
+                console.log(result);
+                if (result.success) {
+                    let resp_data = "";
+                    let fields = result.field;
+
+                    fields.forEach(field => {
+                        // Assuming 'field' has properties like 'dataSourceName', 'id', etc.
+                        resp_data += ` 
+                    <div class="row data_source_field" id="data_source_field${field.id}">
+                        <div class="col-10" style="cursor:pointer;">
+                            <p class="data_source_type size" data-sourcetype="Participant" data-sourceName="${field.dataSourceName}" data-sourceid="${id}" data-type="${field.dataSourceType}" id="${field.id}">${field.dataSourceName}</p>
+                        </div>
+                        <div class="col-2">
+                             <button class="delete_dataSourceField" data-type="${field.dataSourceType}" data-sourceid="${id}" data-id="${field.id}"><i class="fa fa-trash color" aria-hidden="true"></i></button>
+                             <a id="${field.id}" class="edit_data_source_type_btn" data-sourceid="${id}">
+                             <img src="{{asset('public/images/Icons/edit.svg')}}" class="editIcon d-inline float-end border ms-1"  alt="edit" title="edit">
+                             </a>
+                         </div>
+                     </div>`;
+                    });
+
+                    $('.data_field').html(resp_data);
+                }
+            },
+            error: function error(result) {
+                printErrorMessage('#validationErrorsBox', result);
+            },
+        });
+    }
+
 
     $(document).on('click', '.delete_dataSourceField', function() {
         var id = $(this).data('id');
@@ -795,111 +1150,85 @@
 
     });
 
-    function fetch_participantfield(id) {
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    var selectedFieldName = '';
+    var selectedParticipantTypeName = '';
+
+    $(document).on('click', '.data_sources_name', function() {
+        var id = $(this).attr('id');
+        var type = $(this).attr('type');
+        var collectionId = $(this).data('collection-id');
+        selectedParticipantTypeName = collectionId
+        $('#type_of_datasource').val(type);
+        $('#type_of_datasource_id').val(id);
+        $('.data_sources').css('background-color', '#fff');
+        $('#data_sources' + id + '_' + collectionId).css('background-color', '#C8D0D5');
+        $(this).closest('.data_sources').css('background-color', '#C8D0D5');
+
+        if (type == "Actionstep") {
+            if (collectionId) {
+                // console.log("Showing fields for collection", collectionId);
+                fetch_ActionstepSourceField(collectionId);
             }
-        });
-        $.ajax({
-            url: 'Participant_field/' + id,
-            type: 'GET',
+        } else if (type == "ActionstepParticipant") {
+            fetch_ActionstepParticipantField(collectionId)
+        } else if (type == "Custom" || type == "Default") {
+            // console.log("TEST")
+            fetch_DataSourceField(id);
+        } else if (type == "Participant") {
+            fetch_participantfield(id);
+            console.log("selectedFieldName", selectedFieldName);
+            result = `${selectedFieldName}|pt=${selectedParticipantTypeName}`;
+            console.log("Participant result:", result);
+        } else {
+            console.log("Error no type:", type);
+            result = `${dataSourceName}_${fieldName}`;
 
-            success: function success(result) {
-                if (result.success) {
-                    // let participant = "Participant";
-                    var dataSourceName = result.data[0].name;
-                    var dataSourceid = result.data[0].id;
-                    let resp_data = "";
-                    let data = result.field;
-                    // let data2 = result.data[0].get_data_source_type;
-                    //    console.log(dataSourceName);
-
-                    $.each(data, function(key, val) {
-                        // console.log(val.dataSourceName);
-                        var status = val.status;
-                        if (status == 1) {
-                            resp_data += ` 
-                       <div class="row data_source_field" id="data_source_field${val.id}">
-                           <div class="col-10" style="cursor:pointer;">
-                               <p class="data_source_type size" data-sourcetype="Participant" data-sourceName="${dataSourceName}" data-sourceid="${dataSourceid}" data-type="${val.dataSourceType}" id="${val.id}">${val.dataSourceName}</p>
-                           </div>
-                           <div class="col-2">
-                                <button class="delete_dataSourceField" data-type="${val.dataSourceType}" data-sourceid="${dataSourceid}" data-id="${val.id}"><i class="fa fa-trash color" aria-hidden="true"></i></button>
-                                <a id="${val.id}" class="edit_data_source_type_btn" data-sourceid="${dataSourceid}">
-                                <img src="{{asset('public/images/Icons/edit.svg')}}" class="editIcon d-inline float-end border ms-1"  alt="edit" title="edit">
-                                </a>
-                            </div>
-                        </div>`;
-                        }
-                    })
-
-                    $('.data_field').html(resp_data);
-                }
-            },
-            error: function error(result) {
-                printErrorMessage('#validationErrorsBox', result);
-            },
-        });
-    }
-
-
-
-    $('#createDataSourceType').submit(function(event) {
-        var sourcetype = $('#type_of_datasource_id').val();
-
-        event.preventDefault();
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-        $.ajax({
-            url: createDataSourceTypeUrl,
-            type: 'POST',
-            data: $(this).serialize(),
-            success: function success(result) {
-                if (result.success) {
-                    displaySuccessMessage(result.message);
-                    $('#createDataSourceTypeModal').modal('hide');
-                    // location.reload();
-                    console.log(result.field);
-                    var dataSourceName = result.field[0].data_source_type;
-                    console.log(dataSourceName)
-                    if (dataSourceName === "Participant") {
-                        console.log("in if")
-                        fetch_participantfield(sourcetype);
-                    } else {
-                        console.log("in else")
-                        fetch_DataSourceField(sourcetype);
-                    }
-                    $("#result").val();
-                }
-                $("#result").val("");
-            },
-            error: function error(result) {
-                printErrorMessage('#validationErrorsBoxDST', result);
-            },
-        });
-
+        }
 
     });
 
     //get field option and show data source field option
-
     $(document).on('click', '.data_source_type', function() {
         var id = $(this).attr('id');
-        var source_id = $(this).attr('data-type')
+        var source_id = $(this).attr('data-type');
         var sourcetype = $('#type_of_datasource_id').val();
         var text = $(this).text();
         var dataSourceType = $(this).attr('data-sourceType');
         var dataSourceName = $(this).attr('data-sourcename');
+        var dataCollections = @json($dataCollections);
+        var fullId = $(this).attr('id');
+        var parts = fullId.split('--');
+        var collectionId = parts[0];
+        var fieldName = parts[1];
+        var collectionName = dataCollections[collectionId];
+        selectedFieldName = fieldName;
 
-        // console.log('datasourcetype ',dataSourceType,dataSourceName);
+        // Determine the result based on the data source type
+        var result = '';
+        /*
+        console.log("collectionName", collectionName);
+        console.log("fieldName", fieldName);
+        console.log("dataSourceName", dataSourceName);
+        console.log("dataSourceType", dataSourceType);
+        */
+        console.log("selected ffield name", selectedParticipantTypeName);
+        if (dataSourceType === "Actionstep") {
+            result = `${collectionName}_${fieldName}`;
+        } else if (dataSourceType === "Participant") {
+            selectedParticipantTypeName = dataCollections[collectionId];
+            console.log("selected Participant Name", selectedParticipantTypeName);
+
+            result = `${selectedFieldName}|pt=${selectedParticipantTypeName}`;
+        } else {
+            // Handle other types or default case
+            result = `${dataSourceName}_${fieldName}`;
+        }
+
         $('.data_source_field').css('background-color', '#fff');
         $('#data_source_field' + id).css('background-color', '#C8D0D5');
+        $('#result').val(result);
 
-        // console.log(sourcetype)
+
 
         $.ajaxSetup({
             headers: {
@@ -915,7 +1244,9 @@
             success: function success(result) {
                 if (result.success) {
                     var data = result.data;
-                    var dataSourcetype = result.field[0].data_source_type;
+                    // var dataSourcetype = result.field[0].data_source_type;
+                    var dataSourcetype = result.field?.[0]?.data_source_type;
+
                     // console.log(dataSourcetype);
 
                     var resp_data = "";
@@ -964,60 +1295,35 @@
             // },
         });
 
-        var text = $(this).text();
+        // var text = $(this).text();
         //    console.log(dataSourceName);
-        $("#result").val(function() {
-            if (dataSourceType == "Custom") {
-                if ($(this).val() == '') {
-                    return dataSourceName + '_' + text;
-                } else {
-                    return dataSourceName + '_' + text;
-                }
-            } else if (dataSourceType == "Default") {
-                if ($(this).val() == '') {
-                    return text;
-                } else {
-                    return text;
-                }
-            } else {
-                if ($(this).val() == '') {
-                    return text + '|' + dataSourceName;
-                } else {
-                    return text + '|' + dataSourceName;
-                }
-            }
+        // $("#result").val(function() {
+        //     if (dataSourceType == "Custom") {
+        //         if ($(this).val() == '') {
+        //             return dataSourceName + '_' + text;
+        //         } else {
+        //             return dataSourceName + '_' + text;
+        //         }
+        //     } else if (dataSourceType == "Default") {
+        //         if ($(this).val() == '') {
+        //             return text;
+        //         } else {
+        //             return text;
+        //         }
+        //     } else {
+        //         if ($(this).val() == '') {
+        //             return text + '|' + dataSourceName;
+        //         } else {
+        //             return text + '|' + dataSourceName;
+        //         }
+        //     }
 
 
-            // if(dataSourceType=='Action'){
 
-            //     if($(this).val() == '') {
-            //         return dataSourceType+'_'+text + '_'+ dataSourceName;
-            //     } else {
-            //         return dataSourceType+'_'+text + '_'+ dataSourceName;
-            //     }
-
-            // }else if(dataSourceType=='matter_info' || dataSourceType=='crm_info' || dataSourceType=='FamilyLawDetail' || dataSourceType=='key_dates'){
-
-            //     if($(this).val() == '') {
-            //         return dataSourceName+ '|'+ text ;
-            //     } else {
-            //         return dataSourceName+ '|'+ text ;;
-            //     }
-
-            // }else{
-
-            //     if($(this).val() == '') {
-            //         return text;
-            //     } else {
-            //         return text;
-            //     }
-            // }
-
-        });
+        // });
     });
 
     // Getting Data Source Options By Option Type
-
     $(document).on('click', '.field_option_icon', function() {
         var id = $(this).attr('data-id');
         var sourcetype = $('#type_of_datasource_id').val();
@@ -1040,6 +1346,7 @@
                 'source_id': sourcetype
             },
             success: function success(result) {
+
                 if (result.success) {
                     var data = result.data;
                     var resp_data = "";
@@ -1115,6 +1422,46 @@
             },
 
         });
+    });
+
+    $('#createDataSourceType').submit(function(event) {
+        var sourcetype = $('#type_of_datasource_id').val();
+
+        event.preventDefault();
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        $.ajax({
+            url: createDataSourceTypeUrl,
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function success(result) {
+                if (result.success) {
+                    displaySuccessMessage(result.message);
+                    $('#createDataSourceTypeModal').modal('hide');
+                    // location.reload();
+                    // console.log(result.field);
+                    var dataSourceName = result.field[0].data_source_type;
+                    // console.log(dataSourceName)
+                    if (dataSourceName === "Participant") {
+                        console.log("in if")
+                        fetch_participantfield(sourcetype);
+                    } else {
+                        console.log("in else")
+                        fetch_DataSourceField(sourcetype);
+                    }
+                    $("#result").val();
+                }
+                $("#result").val("");
+            },
+            error: function error(result) {
+                printErrorMessage('#validationErrorsBoxDST', result);
+            },
+        });
+
+
     });
 </script>
 

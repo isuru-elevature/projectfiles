@@ -88,37 +88,26 @@ class DataSourceController extends Controller
     {
         $dataSources = DataSource::all();
 
-        // Hardcoded access token (replace with your actual token)
-        $accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhIjoiTjJObFlUVXlOell5WWpnNVlXTTBPR1l5WXpnNU1qYzBOVEpoTjJSaE5XTXhPVFZpT1RSbE16TXlNR1UxIiwiYiI6Im5ld3N0YWZmZWxlIiwiYyI6IjEwLjExLjIxLjMyIiwiZyI6IlQxNi0xMjQtMCIsImUiOiJGIiwiZiI6IkF1c3RyYWxpYVwvQnJpc2JhbmUiLCJoIjoiYiIsImQiOiIiLCJuYmYiOjE2OTg4Mjc5OTQsImV4cCI6MTY5ODg1NjgwNH0.nv2x1PyQEVq1czOs5-CTVLdRRnwSOT4FtwdSsjl0G9QMPwXL41Df_Rmn2TglXtPKnLfgd3Bx-E5L_qrD3CpNRSqpQQ1l0Ff794jmEsms1M02z_0CWAkTGz8gzIDbYsdQaJk8sQSFkjsDVQXnKWdkWuv15TsFlY5o-HPHJbRT_9h1LvwqtO0yubM9BlhWvhJe5v_FuRHuJOiroBUdklmR0-Sqm4AJcIvS_7_uYH6Zuzmu6c3wxLXua5a6r4iLYOIQWCcdlz9ZJzYHLstkQsxvNDHg4ZbtMjkLMt8-oBrsdadNkPVGDNPg8EBvKn0eoqKq9ogEhBTjRUnPPqhJZT9vFw';
+
+        $accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhIjoiWlRoaFlqQXhaR0ZqT0dFeU1tVXhaREZpT0dSaE0yRTRNVFpqTW1RNVpURXpOalkwTVdaak56VXpOelJtIiwiYiI6Im5ld3N0YWZmZWxlIiwiYyI6IjEwLjExLjIxLjMyIiwiZyI6IlQxNi0xMjQtMCIsImUiOiJGIiwiZiI6IkF1c3RyYWxpYVwvQnJpc2JhbmUiLCJoIjoiYiIsImQiOiIiLCJuYmYiOjE2OTg5OTU1OTcsImV4cCI6MTY5OTAyNDQwN30.WvZhQTKfOlXxRGDHYJZnoUx8vSkItzSIUSMrQkd2gn9acLKYhZq1OSml31TDS2wYoeDJ20Zb0z-BuAUOl_I4WCISCbAUY-SztadaH1DYzM7NKhm9F1d9OK1H4YV0D288Awrgfezz6JBJcevX-XMZc5l2y_IoM9fWQZsQTZwypFOsghALzGu4EPnvLIdaXfvdTSiQiEQz1PbdZCwydHIxDnKKSBm1bADjniyOr5DjUd61EolBrGFV21hRyevyyiuoxrh9kavjQrm2fwJdrG6FKdpMpcNlB79aOp20wpzBwW4llhySGOEZtZl3nsOvaJRyLFOZ3bilycs7P5ZhWUrHwQ';
 
         // API URLs
         $apiUrl = 'https://ap-southeast-2.actionstep.com/api/rest/actiontypes';
-        $datacollectionsUrl = 'https://ap-southeast-2.actionstep.com/api/rest/datacollections';
-        $datacollectionsFieldsUrl = 'https://ap-southeast-2.actionstep.com/api/rest/datacollectionfields';
+        $datacollectionsUrl = 'https://ap-southeast-2.actionstep.com/api/rest/datacollections?pageSize=200';
+        $datacollectionsFieldsUrl = 'https://ap-southeast-2.actionstep.com/api/rest/datacollectionfields?pageSize=200';
+        $participanttypesUrl = 'https://ap-southeast-2.actionstep.com/api/rest/participanttypes';
+        $participanttypedatafieldsUrl = 'https://ap-southeast-2.actionstep.com/api/rest/participanttypedatafields';
 
         // Fetch data from Actionstep API
         $actionstepData = $this->makeApiRequest($apiUrl, $accessToken);
         $dataCollectionsData = $this->makeApiRequest($datacollectionsUrl, $accessToken);
         $dataCollectionsFieldsData = $this->makeApiRequest($datacollectionsFieldsUrl, $accessToken);
+        $participantTypesData = $this->makeApiRequest($participanttypesUrl, $accessToken);
+        $participantTypedatafieldsData = $this->makeApiRequest($participanttypedatafieldsUrl, $accessToken);
 
-        // Organize data collections by action type
-        //  $actionTypesWithDataCollections = [];
-        //  if (isset($dataCollectionsData['datacollections'])) {
-        //      foreach ($dataCollectionsData['datacollections'] as $dataCollection) {
-        //          $actionTypeId = $dataCollection['links']['actionType'] ?? null;
-        //          if ($actionTypeId) {
-        //              $actionTypesWithDataCollections[$actionTypeId][] = $dataCollection['label'];
-        //          }
-        //      }
-        //  }
+
         $actionTypesWithDataCollections = [];
-        // foreach ($dataCollectionsData['datacollections'] as $collection) {
-        //     $actionTypeId = $collection['links']['actionType'] ?? null;
-        //     if ($actionTypeId && isset($actionstepData['actiontypes'][$actionTypeId])) {
-        //         $actionTypeName = $actionstepData['actiontypes'][$actionTypeId]['name'];
-        //         $actionTypesWithDataCollections[$actionTypeId][$collection['label']] = $collection['id'];
-        //     }
-        // }
+
 
         foreach ($dataCollectionsData['datacollections'] as $collection) {
             $actionTypeId = $collection['links']['actionType'] ?? null;
@@ -133,36 +122,59 @@ class DataSourceController extends Controller
             }
         }
 
-
-
-        // Filter out fields with dataType HtmlReadOnly and organize by data collection ID
-        // $dataCollectionFieldsByCollection = [];
-        // if (isset($dataCollectionFieldsData['datacollectionfields'])) {
-        //     foreach ($dataCollectionFieldsData['datacollectionfields'] as $field) {
-        //          if ($field['dataType'] !== 'HtmlReadOnly') {
-        //             $dataCollectionId = $field['links']['dataCollection'] ?? null;
-        //             if ($dataCollectionId) {
-        //                 $dataCollectionFieldsByCollection[$dataCollectionId][] = $field['label'];
-        //             }
-        //         }
-        //     }
-        // }
-
         $dataCollectionFieldsByCollection = [];
         foreach ($dataCollectionsFieldsData['datacollectionfields'] as $field) {
             $dataCollectionId = $field['links']['dataCollection'] ?? null;
-            if ($field['dataType'] !== 'HtmlReadOnly') {
-                if ($dataCollectionId) {
-                    $dataCollectionFieldsByCollection[$dataCollectionId][] = $field['label'];
-                }
+            if ($field['dataType'] !== 'HtmlReadOnly' && $dataCollectionId) {
+                $dataCollectionFieldsByCollection[$dataCollectionId][] = [
+                    'id' => $field['id'],
+                    'name' => $field['label']
+                ];
             }
+        }
+
+        /*
+        $participantTypesWithFields = [];
+        foreach ($participantTypesData['participanttypes'] as $participantType) {
+            $participantTypeId = $participantType['id'];
+            $participantTypeName = $participantType['displayName'];
+            $fields = array_filter($participantTypedatafieldsData['participanttypedatafields'], function ($field) use ($participantTypeId) {
+                return $field['links']['participantType'] == $participantTypeId;
+            });
+            
+            $mappedFields = array_map(function ($field) {
+                return $field['label'];
+            }, $fields);
+
+            
+            $participantTypesWithFields[$participantTypeId]['name'] = $participantTypeName;
+            $participantTypesWithFields[$participantTypeId]['fields'] = $mappedFields;
+        }
+        */
+        $participantTypes = [];
+
+        foreach ($participantTypesData['participanttypes'] as $participantType) {
+            $participantTypes[$participantType['id']] = [
+                'name' => $participantType['name'],
+                'displayName' => $participantType['displayName'],
+                'description' => $participantType['description'],
+                'isBaseParticipantType' => $participantType['isBaseParticipantType'],
+                'companyFlag' => $participantType['companyFlag'],
+                'taxNumberAlias' => $participantType['taxNumberAlias']
+            ];
+        }
+        $dataCollections = [];
+        foreach ($dataCollectionsData['datacollections'] as $collection) {
+            $dataCollections[$collection['id']] = $collection['name'];
         }
 
         return view('DataSource.index', [
             'dataSources' => $dataSources,
             'actionstepData' => $actionstepData,
             'actionTypesWithDataCollections' => $actionTypesWithDataCollections,
-            'dataCollectionFieldsByCollection' => $dataCollectionFieldsByCollection
+            'dataCollectionFieldsByCollection' => $dataCollectionFieldsByCollection,
+            'dataCollections' => $dataCollections,
+            'participantTypesWithFields' => $participantTypes
         ]);
     }
 
@@ -348,7 +360,6 @@ class DataSourceController extends Controller
 
     public function getDataSourceType(Request $request, $id)
     {
-
         $dataSourceType = DataSource::where('id', $id)->with('getDataSourceType')->get();
         if (Auth::id() == 1) {
             $dataField = DataSourceType::where('dataSourceType', $id)
@@ -374,6 +385,40 @@ class DataSourceController extends Controller
             ]);
         }
     }
+
+    public function getActionstepCollection(Request $request, $id)
+    {
+
+        $accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhIjoiWlRoaFlqQXhaR0ZqT0dFeU1tVXhaREZpT0dSaE0yRTRNVFpqTW1RNVpURXpOalkwTVdaak56VXpOelJtIiwiYiI6Im5ld3N0YWZmZWxlIiwiYyI6IjEwLjExLjIxLjMyIiwiZyI6IlQxNi0xMjQtMCIsImUiOiJGIiwiZiI6IkF1c3RyYWxpYVwvQnJpc2JhbmUiLCJoIjoiYiIsImQiOiIiLCJuYmYiOjE2OTg5OTU1OTcsImV4cCI6MTY5OTAyNDQwN30.WvZhQTKfOlXxRGDHYJZnoUx8vSkItzSIUSMrQkd2gn9acLKYhZq1OSml31TDS2wYoeDJ20Zb0z-BuAUOl_I4WCISCbAUY-SztadaH1DYzM7NKhm9F1d9OK1H4YV0D288Awrgfezz6JBJcevX-XMZc5l2y_IoM9fWQZsQTZwypFOsghALzGu4EPnvLIdaXfvdTSiQiEQz1PbdZCwydHIxDnKKSBm1bADjniyOr5DjUd61EolBrGFV21hRyevyyiuoxrh9kavjQrm2fwJdrG6FKdpMpcNlB79aOp20wpzBwW4llhySGOEZtZl3nsOvaJRyLFOZ3bilycs7P5ZhWUrHwQ';
+        $datacollectionsFieldsUrl = "https://ap-southeast-2.actionstep.com/api/rest/datacollectionfields?dataCollection_eq={$id}";
+        $dataCollectionsFieldsData = $this->makeApiRequest($datacollectionsFieldsUrl, $accessToken);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'status' => 200,
+                'data' => $dataCollectionsFieldsData,
+            ]);
+        }
+    }
+
+    public function getActionstepParticipantCollection(Request $request, $id)
+{
+    $accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhIjoiWlRoaFlqQXhaR0ZqT0dFeU1tVXhaREZpT0dSaE0yRTRNVFpqTW1RNVpURXpOalkwTVdaak56VXpOelJtIiwiYiI6Im5ld3N0YWZmZWxlIiwiYyI6IjEwLjExLjIxLjMyIiwiZyI6IlQxNi0xMjQtMCIsImUiOiJGIiwiZiI6IkF1c3RyYWxpYVwvQnJpc2JhbmUiLCJoIjoiYiIsImQiOiIiLCJuYmYiOjE2OTg5OTU1OTcsImV4cCI6MTY5OTAyNDQwN30.WvZhQTKfOlXxRGDHYJZnoUx8vSkItzSIUSMrQkd2gn9acLKYhZq1OSml31TDS2wYoeDJ20Zb0z-BuAUOl_I4WCISCbAUY-SztadaH1DYzM7NKhm9F1d9OK1H4YV0D288Awrgfezz6JBJcevX-XMZc5l2y_IoM9fWQZsQTZwypFOsghALzGu4EPnvLIdaXfvdTSiQiEQz1PbdZCwydHIxDnKKSBm1bADjniyOr5DjUd61EolBrGFV21hRyevyyiuoxrh9kavjQrm2fwJdrG6FKdpMpcNlB79aOp20wpzBwW4llhySGOEZtZl3nsOvaJRyLFOZ3bilycs7P5ZhWUrHwQ'; // Replace with your actual access token
+    $participantTypedatafieldsUrl = "https://ap-southeast-2.actionstep.com/api/rest/participanttypedatafields?participantType_eq={$id}";
+    $participantTypedatafieldsData = $this->makeApiRequest($participantTypedatafieldsUrl, $accessToken);
+
+    if ($request->ajax()) {
+        return response()->json([
+            'success' => true,
+            'status' => 200,
+            'data' => $participantTypedatafieldsData,
+        ]);
+    } else {
+        // Handle non-AJAX request if necessary
+        return view('someview', ['data' => $participantTypedatafieldsData]);
+    }
+}
 
     public function getparticipantfield(Request $request, $id)
     {

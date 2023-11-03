@@ -57,6 +57,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('getDataSourceType/{id}',[DataSourceController::class,'getDataSourceType']);
     Route::get('getDataSourceOption/{id}',[DataSourceController::class,'getDataSourceOption']);
     Route::get('getDataSourceOptionByType/{id}',[DataSourceController::class,'getDataSourceOptionByType']);
+
+    Route::get('getActionstepParticipantCollection/{id}', [DataSourceController::class, 'getActionstepParticipantCollection']);
+
+
+    Route::get('getActionstepCollection/{id}',[DataSourceController::class,'getActionstepCollection']);
    
     
     Route::post('createResult', [DataSourceController::class,'createResult'])->name('createResult');
