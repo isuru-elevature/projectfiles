@@ -219,7 +219,7 @@
 
                         <div class="row data_sources" id="participant_type{{ $participantTypeId }}">
                             <div class="col-10" style="cursor:pointer;">
-                                <p class="data_sources_name size" type="ActionstepParticipant" data-collection-id="{{ $participantTypeId }}" id="participant_type{{ $participantTypeId }}">
+                                <p class="data_sources_name size" type="ActionstepParticipant" data-collection-label="{{ $participantType['name'] }}" data-collection-id="{{ $participantTypeId }}" id="participant_type{{ $participantTypeId }}">
                                     Participant - {{ $participantType['name'] }}
                                 </p>
                             </div>
@@ -719,7 +719,7 @@
                             resp_data += `
                                         <div class="row data_source_field" id="data_source_field${field.id}">
                                             <div class="col-10" style="cursor:pointer;">
-                                                <p class="data_source_type size" data-sourcetype="Custom" data-sourceName="${field.name}" data-type="${field.dataType}" id="${field.id}">${field.label}</p>
+                                                <p class="data_source_type size" data-sourcetype="Actionstep" data-sourceName="${field.label}" data-type="${field.dataType}" id="${field.id}">${field.label}</p>
                                             </div>
                                         </div>`;
                         });
@@ -1202,7 +1202,7 @@
         var fieldName = parts[1];
         var collectionName = dataCollections[collectionId];
         selectedFieldName = fieldName;
-
+        
         // Determine the result based on the data source type
         var result = '';
         /*
@@ -1215,10 +1215,9 @@
         if (dataSourceType === "Actionstep") {
             result = `${collectionName}_${fieldName}`;
         } else if (dataSourceType === "Participant") {
-            selectedParticipantTypeName = dataCollections[collectionId];
-            console.log("selected Participant Name", selectedParticipantTypeName);
+            var label = $(`#participant_type${selectedParticipantTypeName} p`).attr('data-collection-label');
 
-            result = `${selectedFieldName}|pt=${selectedParticipantTypeName}`;
+            result = `${dataSourceName}|pt=${label}`;
         } else {
             // Handle other types or default case
             result = `${dataSourceName}_${fieldName}`;
