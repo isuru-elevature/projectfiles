@@ -42,16 +42,17 @@ class DataSourceController extends Controller
 
     public function fetch_dataSource()
     {
-
         if (Auth::id() == 1) {
-            $dataSources = DataSource::select('id', 'name', 'data_source_type', 'status')
+            $dataSources = DataSource::select('id', 'name', 'data_source_type', 'status', 'DisplayOrder')
                 // ->where('created_by',Auth::id())
+                ->orderBy('DisplayOrder', 'asc') // Order by DisplayOrder
                 ->get();
         } else {
-            $dataSources = DataSource::select('id', 'name', 'data_source_type', 'status')
+            $dataSources = DataSource::select('id', 'name', 'data_source_type', 'status', 'DisplayOrder')
                 // ->OrWhere('created_by',Auth::id())
                 ->Where('created_by', 1)
                 ->OrWhere('created_by', Auth::id())
+                ->orderBy('DisplayOrder', 'asc') // Order by DisplayOrder
                 ->get();
         }
         return response()->json([
@@ -59,37 +60,15 @@ class DataSourceController extends Controller
             'data' => $dataSources,
         ]);
     }
-
-    // public function index()
-    // {
-    //     // $dataSources = DataSource::select('id','name','data_source_type','status')
-    //     // ->where('created_by',1)
-    //     // ->OrWhere('created_by',Auth::id())
-    //     // ->get();
-
-    //     if(Auth::id()==1){
-    //         $dataSources = DataSource::select('id','name','data_source_type','status')
-    //         // ->where('created_by',Auth::id())
-    //         ->get();
-    //      }else{
-    //         $dataSources = DataSource::select('id','name','data_source_type','status')
-    //         // ->OrWhere('created_by',Auth::id())
-    //         ->Where('created_by',1)
-    //         ->OrWhere('created_by',Auth::id())
-    //         ->get();
-    //      }
-
-    //     $dataSourcesType = DataSource::select('id','name','data_source_type')->groupBy('data_source_type')->get();
-
-    //     return view('DataSource.index',compact('dataSources','dataSourcesType'));
-    // }
-
+    
     public function index()
     {
-        $dataSources = DataSource::all();
+        $dataSources = DataSource::select('id', 'name', 'data_source_type', 'status', 'DisplayOrder')
+            ->orderBy('DisplayOrder', 'asc') 
+            ->get();
 
 
-        $accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhIjoiWmpWaE9UQmhZakExWkRNeU1qYzFaV00zWXpJMk1qazJaVGxqTnpkbE5qUmtaRGhtTmpFd1pqRTBNRGsxIiwiYiI6Im5ld3N0YWZmZWxlIiwiYyI6IjEwLjExLjIxLjMyIiwiZyI6IlQxNi0xMjQtMCIsImUiOiJGIiwiZiI6IkF1c3RyYWxpYVwvQnJpc2JhbmUiLCJoIjoiYiIsImQiOiIiLCJuYmYiOjE2OTkwNzIyMTUsImV4cCI6MTY5OTEwMTAyNH0.NMh6jQip_-Yl4t88XtrWacNhOHf-qn0lTgmR1RQUCNkKhevOMjzsKWeueMUBgdPPfwEKkKndZxpnzd9UN6coiiU_3zWOESMRo3me4o-1PW6EITWLfJGLem0IO0ThO5W2dy1VhG9BIxpXI0Q7FFyA5uw4VNV7ZyuYk_E1f0RZpbbGc4wGOgw4wxSjp-P80kbvnnhd3UoAevIENQhWuYN3qC5gdmXUIKs9wrHvlGfICKUde8wqQhIGnIF2hz_BQiFUFdH2RW5786MzIUbH8t3ZTKmLTyqMOHugc3m68Htc2SQGanASXQ4eY3eLhG0UZEG1KqdqBPR1FhcUzd9FSc-hXg';
+        $accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhIjoiTmpZNVlqY3lPRE00TmpjMU16bGpaV013T1RjMU1HRm1Nek5tWTJJMU4yTTNNV1l5WVRGalpHRTNOMk16IiwiYiI6Im5ld3N0YWZmZWxlIiwiYyI6IjEwLjExLjIxLjMyIiwiZyI6IlQxNi0xMjUtMSIsImUiOiJGIiwiZiI6IkF1c3RyYWxpYVwvQnJpc2JhbmUiLCJoIjoiYiIsImQiOiIiLCJuYmYiOjE2OTkzOTgyNjQsImV4cCI6MTY5OTQyNzA3NH0.mM74oH4lwc7u6D6lY2T0qSYrZF5z_0-j1fykZqUNLjs2JzGJABYLhdg-yYg0DtrbujuWbdCwyRel35QbrQYGK1DHizBMLqRnkjQiVWvyUM1QiO1-ukMxBwIzdqxoSxPqaAPGZErBQLGU2UZF46BcTS2IkJC55de4MmCxSthDxoGw-6ZpeQFtHMXbDLCIs_6cb-s2vc7PHyxPJ9xrzsXuudiMgwkQrJsQW2OfV1Ef3OqquACtFqrgMhQ1CwF94qNCMqqzYkKwoGNnKaGqMVZyfyo5dzq2Pz84M99_s-solC5Yy33UYqPCZ3f3fIzKGayX946yPLlTneuvia0RBIhrQg';
 
         // API URLs
         $apiUrl = 'https://ap-southeast-2.actionstep.com/api/rest/actiontypes';
@@ -389,7 +368,7 @@ class DataSourceController extends Controller
     public function getActionstepCollection(Request $request, $id)
     {
 
-        $accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhIjoiWmpWaE9UQmhZakExWkRNeU1qYzFaV00zWXpJMk1qazJaVGxqTnpkbE5qUmtaRGhtTmpFd1pqRTBNRGsxIiwiYiI6Im5ld3N0YWZmZWxlIiwiYyI6IjEwLjExLjIxLjMyIiwiZyI6IlQxNi0xMjQtMCIsImUiOiJGIiwiZiI6IkF1c3RyYWxpYVwvQnJpc2JhbmUiLCJoIjoiYiIsImQiOiIiLCJuYmYiOjE2OTkwNzIyMTUsImV4cCI6MTY5OTEwMTAyNH0.NMh6jQip_-Yl4t88XtrWacNhOHf-qn0lTgmR1RQUCNkKhevOMjzsKWeueMUBgdPPfwEKkKndZxpnzd9UN6coiiU_3zWOESMRo3me4o-1PW6EITWLfJGLem0IO0ThO5W2dy1VhG9BIxpXI0Q7FFyA5uw4VNV7ZyuYk_E1f0RZpbbGc4wGOgw4wxSjp-P80kbvnnhd3UoAevIENQhWuYN3qC5gdmXUIKs9wrHvlGfICKUde8wqQhIGnIF2hz_BQiFUFdH2RW5786MzIUbH8t3ZTKmLTyqMOHugc3m68Htc2SQGanASXQ4eY3eLhG0UZEG1KqdqBPR1FhcUzd9FSc-hXg';
+        $accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhIjoiTmpZNVlqY3lPRE00TmpjMU16bGpaV013T1RjMU1HRm1Nek5tWTJJMU4yTTNNV1l5WVRGalpHRTNOMk16IiwiYiI6Im5ld3N0YWZmZWxlIiwiYyI6IjEwLjExLjIxLjMyIiwiZyI6IlQxNi0xMjUtMSIsImUiOiJGIiwiZiI6IkF1c3RyYWxpYVwvQnJpc2JhbmUiLCJoIjoiYiIsImQiOiIiLCJuYmYiOjE2OTkzOTgyNjQsImV4cCI6MTY5OTQyNzA3NH0.mM74oH4lwc7u6D6lY2T0qSYrZF5z_0-j1fykZqUNLjs2JzGJABYLhdg-yYg0DtrbujuWbdCwyRel35QbrQYGK1DHizBMLqRnkjQiVWvyUM1QiO1-ukMxBwIzdqxoSxPqaAPGZErBQLGU2UZF46BcTS2IkJC55de4MmCxSthDxoGw-6ZpeQFtHMXbDLCIs_6cb-s2vc7PHyxPJ9xrzsXuudiMgwkQrJsQW2OfV1Ef3OqquACtFqrgMhQ1CwF94qNCMqqzYkKwoGNnKaGqMVZyfyo5dzq2Pz84M99_s-solC5Yy33UYqPCZ3f3fIzKGayX946yPLlTneuvia0RBIhrQg';
         $datacollectionsFieldsUrl = "https://ap-southeast-2.actionstep.com/api/rest/datacollectionfields?dataCollection_eq={$id}";
         $dataCollectionsFieldsData = $this->makeApiRequest($datacollectionsFieldsUrl, $accessToken);
 
@@ -404,7 +383,7 @@ class DataSourceController extends Controller
 
     public function getActionstepParticipantCollection(Request $request, $id)
 {
-    $accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhIjoiWmpWaE9UQmhZakExWkRNeU1qYzFaV00zWXpJMk1qazJaVGxqTnpkbE5qUmtaRGhtTmpFd1pqRTBNRGsxIiwiYiI6Im5ld3N0YWZmZWxlIiwiYyI6IjEwLjExLjIxLjMyIiwiZyI6IlQxNi0xMjQtMCIsImUiOiJGIiwiZiI6IkF1c3RyYWxpYVwvQnJpc2JhbmUiLCJoIjoiYiIsImQiOiIiLCJuYmYiOjE2OTkwNzIyMTUsImV4cCI6MTY5OTEwMTAyNH0.NMh6jQip_-Yl4t88XtrWacNhOHf-qn0lTgmR1RQUCNkKhevOMjzsKWeueMUBgdPPfwEKkKndZxpnzd9UN6coiiU_3zWOESMRo3me4o-1PW6EITWLfJGLem0IO0ThO5W2dy1VhG9BIxpXI0Q7FFyA5uw4VNV7ZyuYk_E1f0RZpbbGc4wGOgw4wxSjp-P80kbvnnhd3UoAevIENQhWuYN3qC5gdmXUIKs9wrHvlGfICKUde8wqQhIGnIF2hz_BQiFUFdH2RW5786MzIUbH8t3ZTKmLTyqMOHugc3m68Htc2SQGanASXQ4eY3eLhG0UZEG1KqdqBPR1FhcUzd9FSc-hXg'; // Replace with your actual access token
+    $accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhIjoiTmpZNVlqY3lPRE00TmpjMU16bGpaV013T1RjMU1HRm1Nek5tWTJJMU4yTTNNV1l5WVRGalpHRTNOMk16IiwiYiI6Im5ld3N0YWZmZWxlIiwiYyI6IjEwLjExLjIxLjMyIiwiZyI6IlQxNi0xMjUtMSIsImUiOiJGIiwiZiI6IkF1c3RyYWxpYVwvQnJpc2JhbmUiLCJoIjoiYiIsImQiOiIiLCJuYmYiOjE2OTkzOTgyNjQsImV4cCI6MTY5OTQyNzA3NH0.mM74oH4lwc7u6D6lY2T0qSYrZF5z_0-j1fykZqUNLjs2JzGJABYLhdg-yYg0DtrbujuWbdCwyRel35QbrQYGK1DHizBMLqRnkjQiVWvyUM1QiO1-ukMxBwIzdqxoSxPqaAPGZErBQLGU2UZF46BcTS2IkJC55de4MmCxSthDxoGw-6ZpeQFtHMXbDLCIs_6cb-s2vc7PHyxPJ9xrzsXuudiMgwkQrJsQW2OfV1Ef3OqquACtFqrgMhQ1CwF94qNCMqqzYkKwoGNnKaGqMVZyfyo5dzq2Pz84M99_s-solC5Yy33UYqPCZ3f3fIzKGayX946yPLlTneuvia0RBIhrQg'; // Replace with your actual access token
     $participantTypedatafieldsUrl = "https://ap-southeast-2.actionstep.com/api/rest/participanttypedatafields?participantType_eq={$id}";
     $participantTypedatafieldsData = $this->makeApiRequest($participantTypedatafieldsUrl, $accessToken);
 
@@ -467,7 +446,13 @@ class DataSourceController extends Controller
         session::put('data_source_icon', $text);
 
         $source_id = $request->source_id;
-        $dataSourceType = DataSource::where('id', $source_id)->with('getDataSourceType')->get();
+        $dataSourceType = DataSource::where('id', $source_id)->with('getDataSourceType')->first();
+
+        // If dataSourceType is null, create a default object with a default data_source_type
+        if (is_null($dataSourceType)) {
+            $dataSourceType = new \stdClass();
+            $dataSourceType->data_source_type = 'default'; 
+        }
 
         $dataSourceOption = DB::table('data_source_options')->where('option_type', $text)->get();
 
@@ -476,14 +461,13 @@ class DataSourceController extends Controller
                 'success' => true,
                 'status' => 200,
                 'data' => $dataSourceOption,
-                'field' => $dataSourceType,
+                'field' => [$dataSourceType], 
             ]);
         }
     }
 
     public function getDataSourceOptionByType(Request $request, $id)
     {
-
         if ($id != 'Flip') {
             session::put('data_source_icon', $id);
             $dataSourceOption = DB::table('data_source_options')->where('option_type', $id)->get();
@@ -492,14 +476,20 @@ class DataSourceController extends Controller
         }
 
         $source_id = $request->source_id;
-        $dataSourceType = DataSource::where('id', $source_id)->with('getDataSourceType')->get();
+        $dataSourceType = DataSource::where('id', $source_id)->with('getDataSourceType')->first();
+
+        
+        if (is_null($dataSourceType)) {
+            $dataSourceType = new \stdClass();
+            $dataSourceType->data_source_type = 'default'; 
+        }
 
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
                 'status' => 200,
                 'data' => $dataSourceOption,
-                'field' => $dataSourceType,
+                'field' => [$dataSourceType], // Ensure field is always an array
             ]);
         }
     }
