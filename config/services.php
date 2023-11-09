@@ -30,4 +30,13 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'actionstep' => [
+        'client_id' => env('ACTIONSTEP_CLIENT_ID'),
+        'client_secret' => env('ACTIONSTEP_CLIENT_SECRET'),
+        'auth_url' => env('ACTIONSTEP_AUTH_URL'),
+        'token_url' => env('ACTIONSTEP_TOKEN_URL'),
+        'redirect_url' => env('ACTIONSTEP_REDIRECT_URL'),
+    ],
+    
+
 ];

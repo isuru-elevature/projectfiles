@@ -13,10 +13,15 @@ use Maatwebsite\Excel\Facades\Excel;
 use Exception, Validator;
 use DB;
 use Auth;
-use Session;
-
+use Illuminate\Contracts\Session\Session as SessionSession;
+use Illuminate\Support\Facades\Session;
+//i use access toke in 3 places
 class DataSourceController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
 
     public function delete_dataSource($id)
     {
@@ -67,8 +72,10 @@ class DataSourceController extends Controller
             ->orderBy('DisplayOrder', 'asc') 
             ->get();
 
+//now im trying to get the access token via login
+        //$accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhIjoiTmpZNVlqY3lPRE00TmpjMU16bGpaV013T1RjMU1HRm1Nek5tWTJJMU4yTTNNV1l5WVRGalpHRTNOMk16IiwiYiI6Im5ld3N0YWZmZWxlIiwiYyI6IjEwLjExLjIxLjMyIiwiZyI6IlQxNi0xMjUtMSIsImUiOiJGIiwiZiI6IkF1c3RyYWxpYVwvQnJpc2JhbmUiLCJoIjoiYiIsImQiOiIiLCJuYmYiOjE2OTkzOTgyNjQsImV4cCI6MTY5OTQyNzA3NH0.mM74oH4lwc7u6D6lY2T0qSYrZF5z_0-j1fykZqUNLjs2JzGJABYLhdg-yYg0DtrbujuWbdCwyRel35QbrQYGK1DHizBMLqRnkjQiVWvyUM1QiO1-ukMxBwIzdqxoSxPqaAPGZErBQLGU2UZF46BcTS2IkJC55de4MmCxSthDxoGw-6ZpeQFtHMXbDLCIs_6cb-s2vc7PHyxPJ9xrzsXuudiMgwkQrJsQW2OfV1Ef3OqquACtFqrgMhQ1CwF94qNCMqqzYkKwoGNnKaGqMVZyfyo5dzq2Pz84M99_s-solC5Yy33UYqPCZ3f3fIzKGayX946yPLlTneuvia0RBIhrQg';
 
-        $accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhIjoiTmpZNVlqY3lPRE00TmpjMU16bGpaV013T1RjMU1HRm1Nek5tWTJJMU4yTTNNV1l5WVRGalpHRTNOMk16IiwiYiI6Im5ld3N0YWZmZWxlIiwiYyI6IjEwLjExLjIxLjMyIiwiZyI6IlQxNi0xMjUtMSIsImUiOiJGIiwiZiI6IkF1c3RyYWxpYVwvQnJpc2JhbmUiLCJoIjoiYiIsImQiOiIiLCJuYmYiOjE2OTkzOTgyNjQsImV4cCI6MTY5OTQyNzA3NH0.mM74oH4lwc7u6D6lY2T0qSYrZF5z_0-j1fykZqUNLjs2JzGJABYLhdg-yYg0DtrbujuWbdCwyRel35QbrQYGK1DHizBMLqRnkjQiVWvyUM1QiO1-ukMxBwIzdqxoSxPqaAPGZErBQLGU2UZF46BcTS2IkJC55de4MmCxSthDxoGw-6ZpeQFtHMXbDLCIs_6cb-s2vc7PHyxPJ9xrzsXuudiMgwkQrJsQW2OfV1Ef3OqquACtFqrgMhQ1CwF94qNCMqqzYkKwoGNnKaGqMVZyfyo5dzq2Pz84M99_s-solC5Yy33UYqPCZ3f3fIzKGayX946yPLlTneuvia0RBIhrQg';
+        $accessToken = Session::get('access_token');
 
         // API URLs
         $apiUrl = 'https://ap-southeast-2.actionstep.com/api/rest/actiontypes';
@@ -110,7 +117,7 @@ class DataSourceController extends Controller
                     'name' => $field['label']
                 ];
             }
-        }
+        }//
 
         /*
         $participantTypesWithFields = [];
@@ -141,6 +148,7 @@ class DataSourceController extends Controller
                 'companyFlag' => $participantType['companyFlag'],
                 'taxNumberAlias' => $participantType['taxNumberAlias']
             ];
+            //this is the backend where i harddcode the access token to test before i implement this actionstep login
         }
         $dataCollections = [];
         foreach ($dataCollectionsData['datacollections'] as $collection) {
@@ -368,7 +376,8 @@ class DataSourceController extends Controller
     public function getActionstepCollection(Request $request, $id)
     {
 
-        $accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhIjoiTmpZNVlqY3lPRE00TmpjMU16bGpaV013T1RjMU1HRm1Nek5tWTJJMU4yTTNNV1l5WVRGalpHRTNOMk16IiwiYiI6Im5ld3N0YWZmZWxlIiwiYyI6IjEwLjExLjIxLjMyIiwiZyI6IlQxNi0xMjUtMSIsImUiOiJGIiwiZiI6IkF1c3RyYWxpYVwvQnJpc2JhbmUiLCJoIjoiYiIsImQiOiIiLCJuYmYiOjE2OTkzOTgyNjQsImV4cCI6MTY5OTQyNzA3NH0.mM74oH4lwc7u6D6lY2T0qSYrZF5z_0-j1fykZqUNLjs2JzGJABYLhdg-yYg0DtrbujuWbdCwyRel35QbrQYGK1DHizBMLqRnkjQiVWvyUM1QiO1-ukMxBwIzdqxoSxPqaAPGZErBQLGU2UZF46BcTS2IkJC55de4MmCxSthDxoGw-6ZpeQFtHMXbDLCIs_6cb-s2vc7PHyxPJ9xrzsXuudiMgwkQrJsQW2OfV1Ef3OqquACtFqrgMhQ1CwF94qNCMqqzYkKwoGNnKaGqMVZyfyo5dzq2Pz84M99_s-solC5Yy33UYqPCZ3f3fIzKGayX946yPLlTneuvia0RBIhrQg';
+        //$accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhIjoiTmpZNVlqY3lPRE00TmpjMU16bGpaV013T1RjMU1HRm1Nek5tWTJJMU4yTTNNV1l5WVRGalpHRTNOMk16IiwiYiI6Im5ld3N0YWZmZWxlIiwiYyI6IjEwLjExLjIxLjMyIiwiZyI6IlQxNi0xMjUtMSIsImUiOiJGIiwiZiI6IkF1c3RyYWxpYVwvQnJpc2JhbmUiLCJoIjoiYiIsImQiOiIiLCJuYmYiOjE2OTkzOTgyNjQsImV4cCI6MTY5OTQyNzA3NH0.mM74oH4lwc7u6D6lY2T0qSYrZF5z_0-j1fykZqUNLjs2JzGJABYLhdg-yYg0DtrbujuWbdCwyRel35QbrQYGK1DHizBMLqRnkjQiVWvyUM1QiO1-ukMxBwIzdqxoSxPqaAPGZErBQLGU2UZF46BcTS2IkJC55de4MmCxSthDxoGw-6ZpeQFtHMXbDLCIs_6cb-s2vc7PHyxPJ9xrzsXuudiMgwkQrJsQW2OfV1Ef3OqquACtFqrgMhQ1CwF94qNCMqqzYkKwoGNnKaGqMVZyfyo5dzq2Pz84M99_s-solC5Yy33UYqPCZ3f3fIzKGayX946yPLlTneuvia0RBIhrQg';
+        $accessToken = Session::get('access_token');
         $datacollectionsFieldsUrl = "https://ap-southeast-2.actionstep.com/api/rest/datacollectionfields?dataCollection_eq={$id}";
         $dataCollectionsFieldsData = $this->makeApiRequest($datacollectionsFieldsUrl, $accessToken);
 
@@ -383,7 +392,8 @@ class DataSourceController extends Controller
 
     public function getActionstepParticipantCollection(Request $request, $id)
 {
-    $accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhIjoiTmpZNVlqY3lPRE00TmpjMU16bGpaV013T1RjMU1HRm1Nek5tWTJJMU4yTTNNV1l5WVRGalpHRTNOMk16IiwiYiI6Im5ld3N0YWZmZWxlIiwiYyI6IjEwLjExLjIxLjMyIiwiZyI6IlQxNi0xMjUtMSIsImUiOiJGIiwiZiI6IkF1c3RyYWxpYVwvQnJpc2JhbmUiLCJoIjoiYiIsImQiOiIiLCJuYmYiOjE2OTkzOTgyNjQsImV4cCI6MTY5OTQyNzA3NH0.mM74oH4lwc7u6D6lY2T0qSYrZF5z_0-j1fykZqUNLjs2JzGJABYLhdg-yYg0DtrbujuWbdCwyRel35QbrQYGK1DHizBMLqRnkjQiVWvyUM1QiO1-ukMxBwIzdqxoSxPqaAPGZErBQLGU2UZF46BcTS2IkJC55de4MmCxSthDxoGw-6ZpeQFtHMXbDLCIs_6cb-s2vc7PHyxPJ9xrzsXuudiMgwkQrJsQW2OfV1Ef3OqquACtFqrgMhQ1CwF94qNCMqqzYkKwoGNnKaGqMVZyfyo5dzq2Pz84M99_s-solC5Yy33UYqPCZ3f3fIzKGayX946yPLlTneuvia0RBIhrQg'; // Replace with your actual access token
+    //$accessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhIjoiTmpZNVlqY3lPRE00TmpjMU16bGpaV013T1RjMU1HRm1Nek5tWTJJMU4yTTNNV1l5WVRGalpHRTNOMk16IiwiYiI6Im5ld3N0YWZmZWxlIiwiYyI6IjEwLjExLjIxLjMyIiwiZyI6IlQxNi0xMjUtMSIsImUiOiJGIiwiZiI6IkF1c3RyYWxpYVwvQnJpc2JhbmUiLCJoIjoiYiIsImQiOiIiLCJuYmYiOjE2OTkzOTgyNjQsImV4cCI6MTY5OTQyNzA3NH0.mM74oH4lwc7u6D6lY2T0qSYrZF5z_0-j1fykZqUNLjs2JzGJABYLhdg-yYg0DtrbujuWbdCwyRel35QbrQYGK1DHizBMLqRnkjQiVWvyUM1QiO1-ukMxBwIzdqxoSxPqaAPGZErBQLGU2UZF46BcTS2IkJC55de4MmCxSthDxoGw-6ZpeQFtHMXbDLCIs_6cb-s2vc7PHyxPJ9xrzsXuudiMgwkQrJsQW2OfV1Ef3OqquACtFqrgMhQ1CwF94qNCMqqzYkKwoGNnKaGqMVZyfyo5dzq2Pz84M99_s-solC5Yy33UYqPCZ3f3fIzKGayX946yPLlTneuvia0RBIhrQg'; // Replace with your actual access token
+    $accessToken = Session::get('access_token');
     $participantTypedatafieldsUrl = "https://ap-southeast-2.actionstep.com/api/rest/participanttypedatafields?participantType_eq={$id}";
     $participantTypedatafieldsData = $this->makeApiRequest($participantTypedatafieldsUrl, $accessToken);
 
